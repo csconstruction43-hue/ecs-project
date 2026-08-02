@@ -1,0 +1,34 @@
+# Live domain: www.electricianprep.co.uk (kept consistent with src/components/Seo.jsx SITE_URL)
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /checkout
+
+# Explicitly welcome AI answer-engine crawlers (GEO/AIO) — blocking them
+# means your content can never be cited in ChatGPT Search, Perplexity,
+# Gemini, or Google's AI Overviews.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://www.electricianprep.co.uk/sitemap.xml

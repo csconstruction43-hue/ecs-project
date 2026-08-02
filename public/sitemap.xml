@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Live domain: www.electricianprep.co.uk (kept consistent with src/components/Seo.jsx SITE_URL) -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.electricianprep.co.uk/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/mock-test</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+
+  <!-- Core ECS card tests -->
+  <url><loc>https://www.electricianprep.co.uk/ecs-green-card-mock-test</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-black-card-mock-test</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-skilled-worker-test</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-supervisor-test</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <!-- Official ECS assessment types (from src/data/extraTests.js) -->
+  <url><loc>https://www.electricianprep.co.uk/ecs-hse-assessment</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-fess-assessment</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-network-infrastructure-assessment</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-electrical-safety-unit-assessment</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <!-- Extra official-question practice banks -->
+  <url><loc>https://www.electricianprep.co.uk/ecs-extra-practice-electrical</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-extra-practice-safety</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-extra-practice-mega</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-extra-practice-ultra</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+
+  <!-- Study & reference content -->
+  <url><loc>https://www.electricianprep.co.uk/types-of-ecs-cards</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-card-info</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-hse-practice</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/study-guide</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/study-material</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/safety-signs</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/videos</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/practice</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/guest-test</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+
+  <!-- Courses -->
+  <url><loc>https://www.electricianprep.co.uk/courses</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/ecs-health-safety</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/level-2-electrical</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/level-3-electrical</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/18th-edition</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/2391-inspection-testing</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/ev-charging</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/solar-pv-battery</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/pat-testing</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/am2-assessment</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/nvq-level-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/green-card</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/gold-card-supervisor</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/black-card-managers</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/courses/blue-card-skilled</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- ECS card type guides (src/pages/ecs-cards/*) -->
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/labourer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/electrical-labourer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/apprentice</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/trainee-electrician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/industry-placement-t-level</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/experienced-worker-gold-stripe-temp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/site-support-occupations</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/provisional-installation-electrician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/installation-electrician-gold</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/approved-electrician-gold</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/registered-electrician-gold</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/technician-gold</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/maintenance-electrician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/electrical-fitter</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/engineering-maintenance-electrician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/wireman-and-panel-builder</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/marine-electrician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/auto-electrician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/electrical-product-service-engineer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/electrical-winder</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/distribution-networks-electrician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/instruments-mechanic</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/fess-apprentice</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/fess-labourer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/fess-systems-operative</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/fess-systems-technician-engineer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/building-controls-installer-engineer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/network-infrastructure-assistant</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/network-infrastructure-installer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/lv-jointer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/telecommunications-fitter</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/cellular-network-field-engineer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/signal-distribution-specialist</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/telecoms-operative</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/av-operative-av-technician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/broadcast-and-media-supervisor</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/creative-production-operative</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/creative-production-technician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/creative-production-manager</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/iscve-av-engineer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/iscve-sound-engineer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/avixa-commercial-av-integrator</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/radio-and-television-electrician</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/site-supervisor</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/site-manager</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/contracts-manager</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/project-manager</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/academically-qualified-person-aqp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/professionally-qualified-person-pqp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/vehicle-installer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/gate-safe-installer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecs-cards/sll-lighting-professional</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <!-- Commercial pages -->
+  <url><loc>https://www.electricianprep.co.uk/pricing</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/plans</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/book</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/ecscardbooking</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <!-- Blog -->
+  <url><loc>https://www.electricianprep.co.uk/blog</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/how-to-pass-ecs-test-first-time</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-test-pass-rate-2026</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/how-long-does-ecs-test-take</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-test-cost-2026</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/what-happens-if-you-fail-ecs-test</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-card-types-explained-2026</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-card-renewal-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-card-application-process</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-card-vs-cscs-card</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/green-card-ecs-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/blue-card-ecs-skilled-worker-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/gold-card-ecs-supervisor-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/black-card-ecs-manager-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/am2-assessment-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/18th-edition-wiring-regulations-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/level-2-vs-level-3-electrical-qualification</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/2391-inspection-testing-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ev-charging-installation-qualification</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/solar-pv-installer-qualification-uk</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/pat-testing-qualification-guide</loc><lastmod>2026-07-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/how-to-become-an-electrician-uk</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrician-apprenticeship-guide-uk</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/self-employed-electrician-ecs-card</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-card-lost-stolen-replacement</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/battery-storage-installer-qualification</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/nvq-level-3-electrical-installation-guide</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrical-apprenticeship-funding-uk</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/how-long-to-become-a-qualified-electrician</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/mature-candidate-electrician-route-uk</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/smsts-guide-site-managers-safety-training</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-card-check-verify-guide</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/experienced-worker-assessment-ewa-guide</loc><lastmod>2026-07-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-white-card-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/work-at-height-regulations-electricians-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/manual-handling-regulations-electricians-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/domestic-installer-competent-person-scheme-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrician-salary-uk-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrician-tools-checklist-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/fire-safety-electricians-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ppe-for-electricians-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrical-safety-signs-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrical-fault-diagnosis-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/inspection-testing-certificates-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/jib-grading-system-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/riddor-reporting-accidents-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/work-equipment-regulations-puwer-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/special-site-hazards-electricians-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/environmental-good-practice-electricians-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/health-hygiene-construction-sites-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/general-health-safety-work-guide</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <!-- Community / social proof -->
+  <url><loc>https://www.electricianprep.co.uk/leaderboard</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/community</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+
+  <!-- Legal -->
+  <url><loc>https://www.electricianprep.co.uk/terms</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/privacy</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+</urlset>
