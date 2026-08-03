@@ -200,18 +200,6 @@ const LoginPage = () => {
             Create account
           </Link>
         </p>
-
-        {/* Demo Credentials 
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg space-y-2">
-          <p className="text-xs font-semibold text-gray-600 text-center">
-            Demo accounts (password: password123)
-          </p>
-          <div className="grid grid-cols-1 gap-1 text-xs text-gray-500 text-center">
-            <p>Free user: <span className="font-mono">demo@example.com</span></p>
-            <p>Pro user: <span className="font-mono">pro@example.com</span></p>
-            <p>Admin: <span className="font-mono">admin@example.com</span></p>
-          </div>*/}
-        
           <p className="text-[11px] text-gray-400 text-center pt-1">
             First time running this project? Create these by running{' '}
             <span className="font-mono">npm run seed-demo</span> inside <span className="font-mono">/server</span>.
