@@ -1,30 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="bgCheck" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#1e293b"/>
-    </linearGradient>
-    <linearGradient id="circleCheck" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#22c55e"/>
-      <stop offset="100%" stop-color="#15803d"/>
-    </linearGradient>
-    <radialGradient id="glowCheck" cx="50%" cy="40%" r="60%">
-      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
+  <!-- flat navy background, no gradients -->
+  <rect width="512" height="512" rx="112" fill="#0F172A"/>
 
-  <!-- rounded square background -->
-  <rect width="512" height="512" rx="120" fill="url(#bgCheck)"/>
-  <circle cx="256" cy="240" r="210" fill="url(#glowCheck)"/>
-
-  <!-- thin amber accent ring (brand color) -->
-  <circle cx="256" cy="256" r="188" fill="none" stroke="#f59e0b" stroke-width="8" opacity="0.55"/>
-
-  <!-- green success circle -->
-  <circle cx="256" cy="256" r="150" fill="url(#circleCheck)" stroke="#ffffff" stroke-width="10"/>
-
-  <!-- checkmark -->
-  <path d="M186 262 L232 308 L330 200" fill="none" stroke="#ffffff" stroke-width="30"
-        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- single flat amber bolt, precise geometry -->
+  <path d="M280 96
+           L172 296
+           L236 296
+           L216 416
+           L344 208
+           L276 208
+           Z"
+        fill="#F59E0B"/>
 </svg>
