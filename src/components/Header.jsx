@@ -143,9 +143,12 @@ const Header = () => {
         </div>
       )}
 
-      <header className={`sticky top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 transition-shadow duration-300 ${
+      <header
+        className={`sticky top-0 left-0 right-0 z-50 isolate bg-white border-b border-gray-100 transition-shadow duration-300 ${
         isScrolled ? 'shadow-md' : ''
-      }`}>
+      }`}
+        style={{ transform: 'translateZ(0)', WebkitTransform: 'translateZ(0)', willChange: 'transform' }}
+      >
         <div className="h-[3px] w-full" style={{ background: 'var(--hazard-stripe)', backgroundSize: '28px 28px' }} />
 
         {/* Row 1 — logo, search, account */}
