@@ -342,6 +342,18 @@ const apiLimiter = rateLimit({
 })
 app.use('/api', apiLimiter)
 
+// ---- Contact / enquiry form rate limiter ----
+// Moved above all routes that reference it (create-card-payment, /api/contact,
+// /api/book-card) so it's defined before use — fixes:
+// "ReferenceError: Cannot access 'contactLimiter' before initialization"
+const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many enquiries sent. Please try again later.' },
+})
+
 // Stripe webhook — must be before express.json()
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe || !STRIPE_WEBHOOK_SECRET) return res.status(500).send('Stripe not configured.')
@@ -1348,13 +1360,7 @@ app.post('/api/stripe/create-portal-session', requireAuth, async (req, res) => {
 })
 
 // ---- Contact / enquiry form (ECS Card Info page) ----
-const contactLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many enquiries sent. Please try again later.' },
-})
+// (contactLimiter itself is defined near the top of the file, before use)
 
 function contactEmailHtml({ name, email, enquiryType, message }) {
   const esc = (s = '') => String(s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]))
