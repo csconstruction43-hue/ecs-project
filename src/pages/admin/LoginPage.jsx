@@ -200,11 +200,6 @@ const LoginPage = () => {
             Create account
           </Link>
         </p>
-          <p className="text-[11px] text-gray-400 text-center pt-1">
-            First time running this project? Create these by running{' '}
-            <span className="font-mono">npm run seed-demo</span> inside <span className="font-mono">/server</span>.
-          </p>
-        </div>
       </div>
     </div>
   )
