@@ -131,24 +131,18 @@ const Header = () => {
     <>
       {/* Announcement bar */}
       {!isPro && (
-        <div
-          className="bg-gradient-to-r from-blue-500 to-secondary text-white text-center py-2 px-4 text-sm font-medium"
-          style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
-        >
-          <span className="inline-flex items-center justify-center gap-2 flex-wrap text-center">
-            <Zap size={14} className="text-slate-300 shrink-0" />
-            <span>🎯 Get Pro — unlimited tests, AI explanations &amp; analytics</span>
-            <Link to="/plans" className="underline font-bold hover:text-slate-200 transition-colors">Upgrade now →</Link>
+        <div className="bg-gradient-to-r from-blue-500 to-secondary text-white text-center py-2 px-4 text-sm font-medium">
+          <span className="inline-flex items-center gap-2">
+            <Zap size={14} className="text-slate-300" />
+            🎯 Get Pro — unlimited tests, AI explanations & analytics
+            <Link to="/plans" className="underline font-bold hover:text-slate-200 transition-colors ml-1">Upgrade now →</Link>
           </span>
         </div>
       )}
 
-      <header
-        className={`sticky top-0 left-0 right-0 z-50 isolate bg-white border-b border-gray-100 transition-shadow duration-300 ${
+      <header className={`sticky top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 transition-shadow duration-300 ${
         isScrolled ? 'shadow-md' : ''
-      }`}
-        style={{ transform: 'translateZ(0)', WebkitTransform: 'translateZ(0)', willChange: 'transform' }}
-      >
+      }`}>
         <div className="h-[3px] w-full" style={{ background: 'var(--hazard-stripe)', backgroundSize: '28px 28px' }} />
 
         {/* Row 1 — logo, search, account */}
@@ -408,7 +402,7 @@ const Header = () => {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="xl:hidden border-t border-gray-100 bg-white max-h-[calc(100dvh-4rem)] overflow-y-auto">
+          <div className="xl:hidden border-t border-gray-100 bg-white">
             <div className="max-w-7xl mx-auto px-4 py-3">
               <nav className="grid grid-cols-2 gap-1 mb-3">
                 {navLinks.map((link) => (
