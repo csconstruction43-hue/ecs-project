@@ -1,14 +1,42 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- flat navy background, no gradients -->
-  <rect width="512" height="512" rx="112" fill="#0F172A"/>
+  <defs>
+    <linearGradient id="bgRich" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="55%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="boltRich" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="45%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <radialGradient id="glowRich" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheenRich" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
 
-  <!-- single flat amber bolt, precise geometry -->
-  <path d="M280 96
-           L172 296
-           L236 296
-           L216 416
-           L344 208
-           L276 208
-           Z"
-        fill="#F59E0B"/>
+  <!-- rich gradient background -->
+  <rect width="512" height="512" rx="118" fill="url(#bgRich)"/>
+
+  <!-- glow behind bolt -->
+  <circle cx="256" cy="240" r="220" fill="url(#glowRich)"/>
+
+  <!-- top glass sheen -->
+  <rect width="512" height="256" rx="118" fill="url(#sheenRich)"/>
+
+  <!-- subtle ring -->
+  <circle cx="256" cy="256" r="196" fill="none" stroke="#60a5fa" stroke-width="4" opacity="0.3"/>
+
+  <!-- bold glowing bolt with outline -->
+  <path d="M284 82 L164 300 L232 300 L206 430 L348 202 L272 202 Z"
+        fill="url(#boltRich)" stroke="#78350f" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- bolt highlight edge -->
+  <path d="M284 82 L216 202 L272 202 L232 300 L206 430"
+        fill="none" stroke="#fef3c7" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
 </svg>
