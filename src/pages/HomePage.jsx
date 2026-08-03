@@ -661,18 +661,22 @@ const HomePage = () => {
             {pricingPlans.map((plan, index) => (
               <div
                 key={index}
-                className={`bg-white rounded-2xl p-6 border-2 transition-all hover:shadow-xl ${
-                  plan.popular ? 'border-blue-500 shadow-md relative' : 'border-gray-200'
+                className={`relative isolate bg-white rounded-2xl p-6 border-2 transition-all hover:shadow-xl ${
+                  plan.popular ? 'border-blue-500 shadow-md' : 'border-gray-200'
                 } ${plan.bestValue ? 'border-green-500' : ''}`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-4 py-1 rounded-full">
-                    Most Popular
+                  <div className="absolute -top-3 inset-x-0 flex justify-center">
+                    <span className="bg-blue-500 text-white text-xs font-bold px-4 py-1 rounded-full">
+                      Most Popular
+                    </span>
                   </div>
                 )}
                 {plan.bestValue && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs font-bold px-4 py-1 rounded-full">
-                    Best Value
+                  <div className="absolute -top-3 inset-x-0 flex justify-center">
+                    <span className="bg-green-500 text-white text-xs font-bold px-4 py-1 rounded-full">
+                      Best Value
+                    </span>
                   </div>
                 )}
                 
