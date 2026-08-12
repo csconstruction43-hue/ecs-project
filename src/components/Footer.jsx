@@ -33,6 +33,7 @@ const Footer = () => {
     { to: '/terms', label: 'Terms of Service' },
     { to: '/cookies', label: 'Cookie Policy' },
     { to: '/affiliate', label: 'Affiliates' },
+    { to: '/about', label: 'About Us' },
   ]
 
   const socialLinks = [
