@@ -43,10 +43,14 @@ function PrivacyPage() {
         </section>
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Cookies & local storage</h2>
-          <p>We use browser local storage to keep you signed in and to remember preferences like your chosen language and test progress. We don't use third-party advertising trackers.</p>
+          <p>We use browser local storage to keep you signed in and to remember preferences like your chosen language and test progress.</p>
         </section>
         <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Contact</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Advertising</h2>
+          <p>We use Google AdSense to show ads on this site. Google and its partners may use cookies and similar technologies to serve ads based on your visits to this and other websites, and — where required by law (EEA, UK, Switzerland) — we ask for your consent to this via a cookie consent banner before any personalised ads are shown. You can withdraw or change your consent at any time, and you can also opt out of personalised advertising generally through <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Google Ads Settings</a>. For more on how Google uses data, see <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">How Google uses information from sites that use our services</a>.</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Contact</h2>
           <p>Questions about your data? Email <a href="mailto:support@electricianprep.co.uk" className="text-blue-600 hover:underline">support@electricianprep.co.uk</a>.</p>
         </section>
       </div>
