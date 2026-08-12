@@ -7,6 +7,7 @@ import AppShell from './components/AppShell'
 
 // Public Pages
 import HomePage from './pages/HomePage'
+import AboutPage from './pages/AboutPage'
 import CoursesPage from './pages/CoursesPage'
 import CourseDetailPage from './pages/CourseDetailPage'
 import MyCoursesPage from './pages/MyCoursesPage'
@@ -277,6 +278,7 @@ function App() {
           <Route path="videos" element={<VideoLibraryPage />} />
           <Route path="community" element={<CommunityPage />} />
           <Route path="settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+          <Route path="about" element={<AboutPage />} />   ← ye line add karo
           <Route path="terms" element={<TermsPage />} />
           <Route path="privacy" element={<PrivacyPage />} />
           <Route path="signout" element={<SignOutPage />} />
