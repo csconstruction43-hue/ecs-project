@@ -34,6 +34,10 @@ function AboutPage() {
           <p>Whether you're a first-time apprentice booking your ECS test for the first time, or an experienced tradesperson renewing your card, ECSPrep is built to make revision straightforward — accessible on mobile or desktop, and free to get started with no card required.</p>
         </section>
         <section>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Founder</h2>
+          <p>ECSPrep is founded and run by <strong>Alen Vikram</strong>, who built and maintains the platform to give UK electricians and construction workers a free, reliable way to prepare for their ECS test.</p>
+        </section>
+        <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Get in touch</h2>
           <p>Have feedback, spotted an error in a question, or want to suggest something we should add? We'd love to hear from you at <a href="mailto:support@electricianprep.co.uk" className="text-blue-600 hover:underline">support@electricianprep.co.uk</a>.</p>
         </section>
