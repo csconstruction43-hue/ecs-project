@@ -43,6 +43,11 @@ export function AuthProvider({ children }) {
     }
   })
   const [loading, setLoading] = useState(true)
+  // Set the moment an admin blocks this account — either at login/restore,
+  // or live while the person is already browsing (see the polling effect
+  // below). While true, App.jsx shows a blank blocked screen instead of the
+  // site, no matter what route they're on.
+  const [suspended, setSuspended] = useState(false)
 
   const persistUser = useCallback((nextUser) => {
     setUser(nextUser)
@@ -71,6 +76,8 @@ export function AuthProvider({ children }) {
         const { user: freshUser } = await apiRequest('/api/auth/me')
         if (!cancelled) persistUser(freshUser)
       } catch {
+        // apiRequest already flips `suspended` via the account_suspended
+        // event if that's why this failed — just drop the stale session.
         if (!cancelled) {
           setToken(null)
           persistUser(null)
@@ -88,9 +95,37 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const handleExternalLogout = () => persistUser(null)
+    // Fired by apiRequest the instant any call comes back 403
+    // ACCOUNT_SUSPENDED — covers both "tried to log back in" and "was
+    // already browsing when the admin hit Block".
+    const handleSuspended = () => {
+      persistUser(null)
+      setSuspended(true)
+    }
     window.addEventListener('user_logout', handleExternalLogout)
-    return () => window.removeEventListener('user_logout', handleExternalLogout)
+    window.addEventListener('account_suspended', handleSuspended)
+    return () => {
+      window.removeEventListener('user_logout', handleExternalLogout)
+      window.removeEventListener('account_suspended', handleSuspended)
+    }
   }, [persistUser])
+
+  // Live check for people who already had the site open in a tab when an
+  // admin blocked them — /api/auth/me is cheap and requireAuth on the
+  // backend already 403s ACCOUNT_SUSPENDED for a suspended user, so a
+  // light poll is enough to cut an active session within ~30s without
+  // needing sockets.
+  useEffect(() => {
+    if (!user) return undefined
+    const id = setInterval(() => {
+      apiRequest('/api/auth/me').catch(() => {
+        // errors are handled by the account_suspended listener above when
+        // relevant; any other failure (e.g. brief network blip) is ignored
+        // here so it doesn't log people out for unrelated reasons.
+      })
+    }, 30_000)
+    return () => clearInterval(id)
+  }, [user])
 
   const login = useCallback(async ({ email, password }) => {
     setLoading(true)
@@ -108,6 +143,7 @@ export function AuthProvider({ children }) {
       const { token, user: loggedInUser } = result
       setToken(token)
       persistUser(loggedInUser)
+      setSuspended(false)
       return loggedInUser
     } finally {
       setLoading(false)
@@ -126,6 +162,7 @@ export function AuthProvider({ children }) {
       })
       setToken(token)
       persistUser(loggedInUser)
+      setSuspended(false)
       return loggedInUser
     } finally {
       setLoading(false)
@@ -194,6 +231,7 @@ export function AuthProvider({ children }) {
       })
       setToken(token)
       persistUser(newUser)
+      setSuspended(false)
       return newUser
     } finally {
       setLoading(false)
@@ -212,6 +250,7 @@ export function AuthProvider({ children }) {
       })
       setToken(token)
       persistUser(googleUser)
+      setSuspended(false)
       return googleUser
     } finally {
       setLoading(false)
@@ -338,6 +377,7 @@ export function AuthProvider({ children }) {
     isSuperAdmin: user?.role === 'admin',
     isPro: !!user?.isPro,
     loading,
+    suspended,
     login,
     verifyTwoFactorLogin,
     resendTwoFactorCode,

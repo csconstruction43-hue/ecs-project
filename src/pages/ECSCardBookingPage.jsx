@@ -12,9 +12,6 @@ import Seo from '../components/Seo'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
-// Update this to your real WhatsApp business number (with country code, no + or spaces)
-const WHATSAPP_NUMBER = '447000000000'
-
 // PayPal payment link the applicant is sent to once their booking details are submitted
 const PAYPAL_LINK = 'https://www.paypal.com/ncp/payment/EFUEBGBW2G86N'
 
@@ -134,11 +131,6 @@ function ECSCardBookingPage() {
     return Object.keys(errs).length === 0
   }
 
-  const whatsappMessage = encodeURIComponent(
-    `Hi, I'd like to book my ECS card.\nName: ${form.fullName}\nCard type: ${form.cardType}\nPhone: ${form.phone}`
-  )
-  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`
-
   const [stripeLoading, setStripeLoading] = useState(false)
   const [stripeError, setStripeError] = useState('')
 
@@ -179,7 +171,7 @@ function ECSCardBookingPage() {
 
       setDone(true)
     } catch (err) {
-      setSubmitError(err.message || 'Something went wrong. Please try again or message us on WhatsApp.')
+      setSubmitError(err.message || 'Something went wrong. Please try again or contact us.')
     } finally {
       setSubmitting(false)
     }
@@ -224,14 +216,12 @@ function ECSCardBookingPage() {
           </p>
         </div>
         <div className="mt-4">
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noreferrer"
+          <Link
+            to="/contact"
             className="inline-flex items-center gap-2 text-green-700 hover:underline text-sm font-medium"
           >
-            <MessageCircle size={16} /> Or message us on WhatsApp instead
-          </a>
+            <MessageCircle size={16} /> Or contact us instead
+          </Link>
         </div>
         <div className="mt-6">
           <Link to="/" className="text-slate-400 hover:underline text-sm">← Back to home</Link>

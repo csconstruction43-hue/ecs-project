@@ -172,6 +172,8 @@ import XPToast from './components/XPToast'
 import SiteThemeLoader from './components/SiteThemeLoader'
 import AccessibilityToolbar from './components/AccessibilityToolbar'
 import OfflineStatusBanner from './components/OfflineStatusBanner'
+import BlockedAccountScreen from './components/BlockedAccountScreen'
+import { useAuth } from './context/AuthContext'
 import { extraTestRoutePaths } from './data/extraTestsRoutes'
 
 // Lazy-loaded: GenericMockTest pulls in every "extra practice" question
@@ -209,6 +211,12 @@ function SiteFooter() {
 }
 
 function App() {
+  // Suspended accounts get nothing else — no header, no routes, no footer.
+  // This check sits above BrowserRouter so it wins regardless of whatever
+  // URL they're on when the admin blocks them or they try to come back.
+  const { suspended } = useAuth()
+  if (suspended) return <BlockedAccountScreen />
+
   return (
     <BrowserRouter>
       <SiteThemeLoader />

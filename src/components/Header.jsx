@@ -26,7 +26,6 @@ const SEARCH_INDEX = [
   { label: 'ECS Card Info', path: '/ecs-card-info', keywords: 'card info which card' },
   { label: 'Which ECS Card Do I Need?', path: '/which-ecs-card', keywords: 'which card do i need eligibility checker wizard quiz' },
   { label: 'Exam Day Checklist', path: '/exam-day-checklist', keywords: 'exam day checklist what to bring id documents' },
-  { label: 'Team / Employer Dashboard', path: '/team', keywords: 'team employer dashboard site manager workforce card tracker' },
   { label: 'ECS Cards Explained', path: '/cards', keywords: 'ecs cards types' },
   { label: 'Safety Signs', path: '/safety-signs', keywords: 'safety signs symbols' },
   { label: 'Electrician Calculators', path: '/calculators', keywords: 'calculators ohms law voltage drop cable size three phase vat lux calculator' },

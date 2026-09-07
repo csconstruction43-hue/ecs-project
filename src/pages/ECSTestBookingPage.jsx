@@ -12,9 +12,6 @@ import Seo from '../components/Seo'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
-// Update this to your real WhatsApp business number (with country code, no + or spaces)
-const WHATSAPP_NUMBER = '447000000000'
-
 const TEST_CATEGORIES = [
   'Site Supervisor',
   'Trainee',
@@ -68,11 +65,6 @@ function ECSTestBookingPage() {
     return Object.keys(errs).length === 0
   }
 
-  const whatsappMessage = encodeURIComponent(
-    `Hi, I'd like to book my ECS test.\nName: ${form.fullName}\nCategory: ${form.testCategory}\nPhone: ${form.phone}`
-  )
-  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitError('')
@@ -89,7 +81,7 @@ function ECSTestBookingPage() {
       if (!res.ok) throw new Error(data?.error || 'Something went wrong. Please try again.')
       setDone(true)
     } catch (err) {
-      setSubmitError(err.message || 'Something went wrong. Please try again or message us on WhatsApp.')
+      setSubmitError(err.message || 'Something went wrong. Please try again or contact us.')
     } finally {
       setSubmitting(false)
     }
@@ -117,14 +109,12 @@ function ECSTestBookingPage() {
         </div>
 
         <div className="mt-4">
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noreferrer"
+          <Link
+            to="/contact"
             className="inline-flex items-center gap-2 text-green-700 hover:underline text-sm font-medium"
           >
-            <MessageCircle size={16} /> Or message us on WhatsApp instead
-          </a>
+            <MessageCircle size={16} /> Or contact us instead
+          </Link>
         </div>
         <div className="mt-6">
           <Link to="/" className="text-slate-400 hover:underline text-sm">← Back to home</Link>
@@ -215,9 +205,9 @@ function ECSTestBookingPage() {
 
         <p className="text-center text-sm text-slate-500">
           or{' '}
-          <a href={whatsappLink} target="_blank" rel="noreferrer" className="text-green-700 font-medium hover:underline">
-            message us on WhatsApp
-          </a>
+          <Link to="/contact" className="text-green-700 font-medium hover:underline">
+            contact us
+          </Link>
         </p>
       </form>
     </div>

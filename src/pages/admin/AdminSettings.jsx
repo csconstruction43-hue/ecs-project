@@ -48,6 +48,12 @@ const TOGGLE_DEFS = [
     onText: 'Shown at the bottom of the blog list and every blog post, with benefits, how it works, and how long it takes — separate from the ECS Card banner above.',
     offText: 'Hidden — no test-booking banner shown on the blog right now.',
   },
+  {
+    key: 'dashboardEcsBookingLinksEnabled',
+    label: '"ECS Card" & "ECS Test" links on user dashboards',
+    onText: 'Both links are shown together in every signed-in user\'s dashboard sidebar (under "Get Booked"), pointing to the ECS Card and ECS Test booking pages.',
+    offText: 'Hidden from every user\'s dashboard right now — neither link shows until you turn this on.',
+  },
 ]
 
 const AdminSettings = () => {

@@ -9,10 +9,11 @@ import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutGrid, BookOpen, ClipboardList, ListChecks, XCircle, Library,
   Zap, BarChart3, Tag, Users, Settings, LogOut, Crown, Layers, RotateCcw, Trophy,
-  Shield, BookOpenCheck, Video, MessageSquare, Sparkles, CalendarDays, MapPin, IdCard,
-  Building2, ClipboardCheck, HelpCircle, CreditCard, Target,
+  Shield, BookOpenCheck, Video, MessageSquare, Sparkles, CalendarDays,
+  ClipboardCheck, HelpCircle, CreditCard, Target,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { apiRequest } from '../lib/api'
 import LanguageSwitcher from './LanguageSwitcher'
 import ThemeToggle from './ThemeToggle'
 import { claimDailyLoginBonus } from '../lib/gamification'
@@ -54,13 +55,24 @@ const moreItems = [
 // UK-specific candidate tools — finding a test centre and tracking card
 // renewal are both things a UK ECS candidate needs but that live outside
 // the core study/revision flow.
+// Test Centre Finder, Card Renewal Reminder, and Team Card Tracker were
+// removed from this list on request — hidden from the user dashboard.
+// The pages themselves still exist and work if linked to directly; they're
+// just no longer surfaced in the sidebar.
 const ukToolsItems = [
-  { icon: MapPin, name: 'Test Centre Finder', path: '/test-centre-finder' },
-  { icon: IdCard, name: 'Card Renewal Reminder', path: '/card-renewal-reminder' },
   { icon: HelpCircle, name: 'Which ECS Card?', path: '/which-ecs-card' },
   { icon: ClipboardCheck, name: 'Exam Day Checklist', path: '/exam-day-checklist' },
-  { icon: Building2, name: 'Team Card Tracker', path: '/team' },
   { icon: CreditCard, name: 'My Card Application', path: '/my-card-application' },
+]
+
+// New feature: "Book Your ECS Card" / "Book Your ECS Test" — links to the
+// paid booking-assistance service, shown on every signed-in user's
+// dashboard sidebar. Both live behind a single admin toggle
+// (dashboardEcsBookingLinksEnabled, off by default) — see the settings
+// fetch in AppShell below. When off, neither link renders at all.
+const ecsBookingItems = [
+  { icon: CreditCard, name: 'ECS Card', path: '/ecscardbooking' },
+  { icon: ClipboardCheck, name: 'ECS Test', path: '/ecstestbooking' },
 ]
 
 const bottomItems = [
@@ -76,6 +88,18 @@ export default function AppShell({ children }) {
   const isActive = (path) => location.pathname === path
   const firstName = (user?.name || 'there').split(' ')[0]
   const initial = (user?.name || 'U').trim().charAt(0).toUpperCase()
+
+  // New feature: fetches the admin's dashboardEcsBookingLinksEnabled
+  // toggle so the "ECS Card" / "ECS Test" sidebar links only render when
+  // an admin has explicitly turned them on (default: hidden from everyone).
+  const [ecsBookingLinksEnabled, setEcsBookingLinksEnabled] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    apiRequest('/api/settings/public', { auth: false })
+      .then((data) => { if (!cancelled) setEcsBookingLinksEnabled(!!data.dashboardEcsBookingLinksEnabled) })
+      .catch(() => { if (!cancelled) setEcsBookingLinksEnabled(false) })
+    return () => { cancelled = true }
+  }, [])
 
   // Daily Login Bonus — fires once per calendar day the first time a
   // signed-in user lands in the app shell (any page). claimDailyLoginBonus()
@@ -195,6 +219,28 @@ export default function AppShell({ children }) {
               </Link>
             )
           })}
+
+          {ecsBookingLinksEnabled && (
+            <>
+              {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2 mt-4">GET BOOKED</div>}
+              {ecsBookingItems.map((item) => {
+                const Icon = item.icon
+                const active = isActive(item.path)
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-sm font-medium transition-colors ${
+                      active ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <Icon size={18} className="shrink-0" />
+                    {sidebarOpen && <span className="truncate">{item.name}</span>}
+                  </Link>
+                )
+              })}
+            </>
+          )}
 
           {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2 mt-4">MORE</div>}
           {moreItems.map((item) => {

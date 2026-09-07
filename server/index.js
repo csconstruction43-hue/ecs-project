@@ -558,7 +558,7 @@ async function requireAuth(req, res, next) {
     const payload = jwt.verify(token, JWT_SECRET)
     const user = await findById(payload.sub)
     if (!user || user.deletedAt) return res.status(401).json({ error: 'Session expired.' })
-    if (user.suspended && user.role !== 'admin') return res.status(403).json({ error: 'This account has been suspended. Contact support if you think this is a mistake.' })
+    if (user.suspended && user.role !== 'admin') return res.status(403).json({ error: 'This account has been suspended. Contact support if you think this is a mistake.', code: 'ACCOUNT_SUSPENDED' })
     req.user = user; next()
   } catch { return res.status(401).json({ error: 'Invalid or expired session.' }) }
 }
@@ -601,6 +601,12 @@ const DEFAULT_PUBLIC_SETTINGS = {
   // blog post — a separate toggle from the card-booking one above, off by
   // default until an admin turns it on.
   blogTestBookingUpsellEnabled: false,
+  // New feature: single master switch controlling BOTH the "ECS Card" and
+  // "ECS Test" sidebar links shown to signed-in users on their dashboard
+  // (AppShell). Off by default — neither link is visible to any user
+  // until an admin turns this on; when off, both are hidden together
+  // (there's deliberately no separate on/off per link).
+  dashboardEcsBookingLinksEnabled: false,
   // UK Festival greeting banner — shown sitewide (Layout, under the header)
   // whenever today falls inside a festival's window, e.g. "Happy Diwali!".
   // The home page also gets a bigger "pro" version of the same banner,
@@ -664,7 +670,7 @@ app.patch('/api/admin/settings', requireAuth, requireAdmin, requireSuperAdmin, a
   }
   if (Object.keys(patch).length === 0) return res.status(400).json({ error: 'No valid settings were provided.' })
   if ('siteTheme' in patch && typeof patch.siteTheme !== 'string') return res.status(400).json({ error: '"siteTheme" must be a string.' })
-  for (const boolKey of ['ecsCardsPageEnabled', 'blogPageEnabled', 'registrationEnabled', 'maintenanceMode', 'announcementEnabled', 'blogCardBookingUpsellEnabled', 'blogTestBookingUpsellEnabled', 'festivalBannerEnabled', 'festivalHomeBannerEnabled']) {
+  for (const boolKey of ['ecsCardsPageEnabled', 'blogPageEnabled', 'registrationEnabled', 'maintenanceMode', 'announcementEnabled', 'blogCardBookingUpsellEnabled', 'blogTestBookingUpsellEnabled', 'dashboardEcsBookingLinksEnabled', 'festivalBannerEnabled', 'festivalHomeBannerEnabled']) {
     if (boolKey in patch && typeof patch[boolKey] !== 'boolean') return res.status(400).json({ error: `"${boolKey}" must be true or false.` })
   }
   if ('festivalBannerDesign' in patch && !['gradient', 'minimal', 'glow', 'bordered'].includes(patch.festivalBannerDesign)) {
@@ -786,7 +792,7 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body || {}
     const user = await findByEmail(email || '')
     if (!user || !user.password) return res.status(401).json({ error: 'Invalid email or password.' })
-    if (user.suspended) return res.status(403).json({ error: 'This account has been suspended. Contact support if you think this is a mistake.' })
+    if (user.suspended) return res.status(403).json({ error: 'This account has been suspended. Contact support if you think this is a mistake.', code: 'ACCOUNT_SUSPENDED' })
     const valid = await bcrypt.compare(password || '', user.password)
     if (!valid) return res.status(401).json({ error: 'Invalid email or password.' })
 
@@ -825,7 +831,7 @@ app.post('/api/auth/2fa/verify', async (req, res) => {
 
   const user = await findById(payload.sub)
   if (!user) return res.status(401).json({ error: 'Account not found.' })
-  if (user.suspended) return res.status(403).json({ error: 'This account has been suspended. Contact support if you think this is a mistake.' })
+  if (user.suspended) return res.status(403).json({ error: 'This account has been suspended. Contact support if you think this is a mistake.', code: 'ACCOUNT_SUSPENDED' })
   await issueLoginSuccess(user, res)
 })
 
@@ -862,6 +868,7 @@ app.post('/api/auth/google', async (req, res) => {
       user = await createUser({ id: `user_${Date.now()}`, name: payload.name || payload.email, email: payload.email, password: null, provider: 'google', avatar: payload.picture || null, role: roleForEmail(payload.email), isPro: false, plan: null, referralCode: generateReferralCode(), referredBy, createdAt: new Date().toISOString() })
       if (referredBy) await logActivity({ userId: referredBy, type: 'referral_signup', meta: { newUserId: user.id } })
     } else {
+      if (user.suspended) return res.status(403).json({ error: 'This account has been suspended. Contact support if you think this is a mistake.', code: 'ACCOUNT_SUSPENDED' })
       const desiredRole = roleForEmail(user.email)
       if (desiredRole !== user.role) user = await updateUser(user.id, { role: desiredRole })
     }

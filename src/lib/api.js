@@ -43,6 +43,14 @@ export async function apiRequest(path, { method = 'GET', body, auth = true } = {
   }
 
   if (!res.ok) {
+    // Admin blocked this account — kill the session everywhere immediately
+    // (not just on the call that happened to notice) and tell the rest of
+    // the app so it can drop to the blocked screen instead of whatever was
+    // about to render. See AuthContext's 'account_suspended' listener.
+    if (data?.code === 'ACCOUNT_SUSPENDED') {
+      setToken(null)
+      window.dispatchEvent(new CustomEvent('account_suspended', { detail: data }))
+    }
     throw new Error(data?.error || 'Something went wrong. Please try again.')
   }
   return data
