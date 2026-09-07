@@ -1,8 +1,9 @@
 // pages/admin/AdminSettings.jsx
-import React, { useEffect, useState } from 'react'
-import { Loader2, Palette, Check, Megaphone } from 'lucide-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Loader2, Palette, Check, Megaphone, LayoutGrid } from 'lucide-react'
 import { apiRequest } from '../../lib/api'
 import { SITE_THEMES, DEFAULT_THEME_ID, applyTheme } from '../../lib/siteThemes'
+import DASHBOARD_LINK_REGISTRY from '../../lib/dashboardLinkRegistry'
 
 const ANNOUNCEMENT_TYPES = [
   { value: 'info', label: 'Info (blue)' },
@@ -14,6 +15,12 @@ const TOGGLE_DEFS = [
   {
     key: 'ecsCardsPageEnabled',
     label: '"Types of ECS Cards" page',
+    onText: 'Visible to everyone. Turn this off to hide it from users (admins will still see it).',
+    offText: 'Hidden from users right now — they see a locked page. Only admins can see the real page.',
+  },
+  {
+    key: 'mockTestsPageEnabled',
+    label: '"ECS Mock Tests" page',
     onText: 'Visible to everyone. Turn this off to hide it from users (admins will still see it).',
     offText: 'Hidden from users right now — they see a locked page. Only admins can see the real page.',
   },
@@ -47,6 +54,12 @@ const TOGGLE_DEFS = [
     label: '"Book Your ECS Test" banner on the blog',
     onText: 'Shown at the bottom of the blog list and every blog post, with benefits, how it works, and how long it takes — separate from the ECS Card banner above.',
     offText: 'Hidden — no test-booking banner shown on the blog right now.',
+  },
+  {
+    key: 'myCardApplicationLinkEnabled',
+    label: '"My Card Application" link on user dashboards',
+    onText: 'Shown in every signed-in user\'s dashboard sidebar (under "UK Tools").',
+    offText: 'Hidden from every user\'s dashboard sidebar right now — the link won\'t show until you turn this on.',
   },
   {
     key: 'dashboardEcsBookingLinksEnabled',
@@ -87,6 +100,23 @@ const AdminSettings = () => {
     if (!settings) return
     patchSettings({ [def.key]: !settings[def.key] }, def.key)
   }
+
+  const toggleDashboardLink = async (linkKey) => {
+    if (!settings) return
+    const current = settings.dashboardLinkVisibility || {}
+    const isVisible = current[linkKey] !== false
+    const nextVisibility = { ...current, [linkKey]: !isVisible }
+    await patchSettings({ dashboardLinkVisibility: nextVisibility }, `dashlink:${linkKey}`)
+  }
+
+  const dashboardLinksBySection = useMemo(() => {
+    const groups = {}
+    for (const link of DASHBOARD_LINK_REGISTRY) {
+      if (!groups[link.section]) groups[link.section] = []
+      groups[link.section].push(link)
+    }
+    return groups
+  }, [])
 
   // Announcement banner: message/type are edited locally and saved with an
   // explicit button (so we don't fire a save request on every keystroke),
@@ -209,6 +239,52 @@ const AdminSettings = () => {
                   </div>
                 )
               })}
+            </div>
+          </div>
+
+          {/* User dashboard sidebar links */}
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <LayoutGrid className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-800">User dashboard links</h2>
+            </div>
+            <p className="text-sm text-gray-500 mb-5">
+              Decide exactly what shows up in every signed-in user's dashboard sidebar. Turn a link on and every user sees it; turn it off and it disappears from their sidebar (the page itself still works if someone has it bookmarked — this only controls the sidebar link).
+            </p>
+
+            <div className="space-y-5">
+              {Object.entries(dashboardLinksBySection).map(([section, links]) => (
+                <div key={section}>
+                  <p className="text-xs font-semibold tracking-wide text-gray-400 mb-2">{section.toUpperCase()}</p>
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {links.map((link) => {
+                      const isOn = (settings.dashboardLinkVisibility || {})[link.key] !== false
+                      const isSaving = savingKey === `dashlink:${link.key}`
+                      return (
+                        <div key={link.key} className="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2.5">
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">{link.title}</p>
+                            <p className="text-xs text-gray-400 font-mono">{link.path}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => toggleDashboardLink(link.key)}
+                            disabled={!!savingKey}
+                            aria-pressed={isOn}
+                            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-60 ${isOn ? 'bg-green-600' : 'bg-gray-300'}`}
+                          >
+                            {isSaving ? (
+                              <Loader2 className="w-3 h-3 animate-spin text-white mx-auto" />
+                            ) : (
+                              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${isOn ? 'translate-x-6' : 'translate-x-1'}`} />
+                            )}
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

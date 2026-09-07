@@ -17,6 +17,7 @@ import { apiRequest } from '../lib/api'
 import LanguageSwitcher from './LanguageSwitcher'
 import ThemeToggle from './ThemeToggle'
 import { claimDailyLoginBonus } from '../lib/gamification'
+import DASHBOARD_LINK_REGISTRY from '../lib/dashboardLinkRegistry'
 
 const menuItems = [
   { icon: LayoutGrid, name: 'Dashboard', path: '/dashboard' },
@@ -89,17 +90,38 @@ export default function AppShell({ children }) {
   const firstName = (user?.name || 'there').split(' ')[0]
   const initial = (user?.name || 'U').trim().charAt(0).toUpperCase()
 
-  // New feature: fetches the admin's dashboardEcsBookingLinksEnabled
-  // toggle so the "ECS Card" / "ECS Test" sidebar links only render when
-  // an admin has explicitly turned them on (default: hidden from everyone).
+  // New feature: fetches the admin's dashboardEcsBookingLinksEnabled,
+  // myCardApplicationLinkEnabled and dashboardLinkVisibility settings so
+  // sidebar links only render when an admin has them turned on.
   const [ecsBookingLinksEnabled, setEcsBookingLinksEnabled] = useState(false)
+  const [myCardApplicationLinkEnabled, setMyCardApplicationLinkEnabled] = useState(true)
+  const [dashboardLinkVisibility, setDashboardLinkVisibility] = useState({})
   useEffect(() => {
     let cancelled = false
     apiRequest('/api/settings/public', { auth: false })
-      .then((data) => { if (!cancelled) setEcsBookingLinksEnabled(!!data.dashboardEcsBookingLinksEnabled) })
-      .catch(() => { if (!cancelled) setEcsBookingLinksEnabled(false) })
+      .then((data) => {
+        if (cancelled) return
+        setEcsBookingLinksEnabled(!!data.dashboardEcsBookingLinksEnabled)
+        setMyCardApplicationLinkEnabled(data.myCardApplicationLinkEnabled !== false)
+        setDashboardLinkVisibility(data.dashboardLinkVisibility || {})
+      })
+      .catch(() => {
+        if (cancelled) return
+        setEcsBookingLinksEnabled(false)
+        setMyCardApplicationLinkEnabled(true)
+        setDashboardLinkVisibility({})
+      })
     return () => { cancelled = true }
   }, [])
+
+  // A link not listed in DASHBOARD_LINK_REGISTRY (core nav, or links with
+  // their own dedicated toggle above) is always visible. Otherwise it's
+  // visible unless an admin has explicitly turned it off.
+  const isDashboardLinkVisible = (path) => {
+    const entry = DASHBOARD_LINK_REGISTRY.find((r) => r.path === path)
+    if (!entry) return true
+    return dashboardLinkVisibility[entry.key] !== false
+  }
 
   // Daily Login Bonus — fires once per calendar day the first time a
   // signed-in user lands in the app shell (any page). claimDailyLoginBonus()
@@ -149,7 +171,7 @@ export default function AppShell({ children }) {
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-3">
           {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2">STUDY</div>}
-          {menuItems.map((item) => {
+          {menuItems.filter((item) => isDashboardLinkVisible(item.path)).map((item) => {
             const Icon = item.icon
             const active = isActive(item.path)
             return (
@@ -167,7 +189,7 @@ export default function AppShell({ children }) {
           })}
 
           {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2 mt-4">REVISION CENTRE</div>}
-          {revisionItems.map((item) => {
+          {revisionItems.filter((item) => isDashboardLinkVisible(item.path)).map((item) => {
             const Icon = item.icon
             const active = isActive(item.path)
             return (
@@ -185,7 +207,7 @@ export default function AppShell({ children }) {
           })}
 
           {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2 mt-4">AI TOOLS</div>}
-          {aiItems.map((item) => {
+          {aiItems.filter((item) => isDashboardLinkVisible(item.path)).map((item) => {
             const Icon = item.icon
             const active = isActive(item.path)
             return (
@@ -203,7 +225,10 @@ export default function AppShell({ children }) {
           })}
 
           {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2 mt-4">UK TOOLS</div>}
-          {ukToolsItems.map((item) => {
+          {ukToolsItems
+            .filter((item) => item.path !== '/my-card-application' || myCardApplicationLinkEnabled)
+            .filter((item) => isDashboardLinkVisible(item.path))
+            .map((item) => {
             const Icon = item.icon
             const active = isActive(item.path)
             return (
@@ -243,7 +268,7 @@ export default function AppShell({ children }) {
           )}
 
           {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2 mt-4">MORE</div>}
-          {moreItems.map((item) => {
+          {moreItems.filter((item) => isDashboardLinkVisible(item.path)).map((item) => {
             const Icon = item.icon
             const active = isActive(item.path)
             return (

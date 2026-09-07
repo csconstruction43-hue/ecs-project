@@ -591,6 +591,9 @@ const PUBLIC_SETTINGS_KEY = 'public'
 const DEFAULT_PUBLIC_SETTINGS = {
   siteTheme: 'forest-green', // matches the site's current green branding
   ecsCardsPageEnabled: true,
+  // Same idea as ecsCardsPageEnabled above, but for the "Types of ECS
+  // Tests" / mock tests browse page (MockTestsPage, route /mock-test).
+  mockTestsPageEnabled: true,
   blogPageEnabled: true,
   registrationEnabled: true,
   maintenanceMode: false,
@@ -607,6 +610,12 @@ const DEFAULT_PUBLIC_SETTINGS = {
   // until an admin turns this on; when off, both are hidden together
   // (there's deliberately no separate on/off per link).
   dashboardEcsBookingLinksEnabled: false,
+  // "My Card Application" link in the signed-in user's dashboard sidebar
+  // (under UK Tools). On by default since it's always been shown; an admin
+  // can turn it off to hide just this link. The page itself
+  // (/my-card-application) keeps working for anyone who has it bookmarked
+  // — this only controls whether the sidebar link renders.
+  myCardApplicationLinkEnabled: true,
   // UK Festival greeting banner — shown sitewide (Layout, under the header)
   // whenever today falls inside a festival's window, e.g. "Happy Diwali!".
   // The home page also gets a bigger "pro" version of the same banner,
@@ -625,6 +634,16 @@ const DEFAULT_PUBLIC_SETTINGS = {
   // This is separate from ecsCardsPageEnabled/blogPageEnabled above, which
   // predate this generic system and stay as their own dedicated flags.
   pageVisibility: {},
+  // Generic show/hide control for links inside the SIGNED-IN user's
+  // dashboard sidebar (AppShell) — Study Guide, Mock Test, Flashcards,
+  // Analytics, etc. Keyed by the link's key in
+  // src/lib/dashboardLinkRegistry.js; a key missing here means "visible"
+  // (default). This is separate from myCardApplicationLinkEnabled and
+  // dashboardEcsBookingLinksEnabled above, which predate this generic
+  // system and stay as their own dedicated flags — and separate from
+  // pageVisibility above, which controls public marketing pages, not the
+  // logged-in dashboard sidebar.
+  dashboardLinkVisibility: {},
   // Sitewide announcement banner (e.g. "CITB test slots open for March"),
   // shown just under the header until an admin turns it off.
   announcementEnabled: false,
@@ -670,7 +689,7 @@ app.patch('/api/admin/settings', requireAuth, requireAdmin, requireSuperAdmin, a
   }
   if (Object.keys(patch).length === 0) return res.status(400).json({ error: 'No valid settings were provided.' })
   if ('siteTheme' in patch && typeof patch.siteTheme !== 'string') return res.status(400).json({ error: '"siteTheme" must be a string.' })
-  for (const boolKey of ['ecsCardsPageEnabled', 'blogPageEnabled', 'registrationEnabled', 'maintenanceMode', 'announcementEnabled', 'blogCardBookingUpsellEnabled', 'blogTestBookingUpsellEnabled', 'dashboardEcsBookingLinksEnabled', 'festivalBannerEnabled', 'festivalHomeBannerEnabled']) {
+  for (const boolKey of ['ecsCardsPageEnabled', 'mockTestsPageEnabled', 'blogPageEnabled', 'registrationEnabled', 'maintenanceMode', 'announcementEnabled', 'blogCardBookingUpsellEnabled', 'blogTestBookingUpsellEnabled', 'dashboardEcsBookingLinksEnabled', 'myCardApplicationLinkEnabled', 'festivalBannerEnabled', 'festivalHomeBannerEnabled']) {
     if (boolKey in patch && typeof patch[boolKey] !== 'boolean') return res.status(400).json({ error: `"${boolKey}" must be true or false.` })
   }
   if ('festivalBannerDesign' in patch && !['gradient', 'minimal', 'glow', 'bordered'].includes(patch.festivalBannerDesign)) {
@@ -686,6 +705,13 @@ app.patch('/api/admin/settings', requireAuth, requireAdmin, requireSuperAdmin, a
     const isPlainObject = pv && typeof pv === 'object' && !Array.isArray(pv)
     if (!isPlainObject || !Object.values(pv).every((v) => typeof v === 'boolean')) {
       return res.status(400).json({ error: '"pageVisibility" must be an object mapping page keys to true/false.' })
+    }
+  }
+  if ('dashboardLinkVisibility' in patch) {
+    const dlv = patch.dashboardLinkVisibility
+    const isPlainObject = dlv && typeof dlv === 'object' && !Array.isArray(dlv)
+    if (!isPlainObject || !Object.values(dlv).every((v) => typeof v === 'boolean')) {
+      return res.status(400).json({ error: '"dashboardLinkVisibility" must be an object mapping dashboard link keys to true/false.' })
     }
   }
   if ('announcementMessage' in patch && typeof patch.announcementMessage !== 'string') return res.status(400).json({ error: '"announcementMessage" must be a string.' })
