@@ -15,6 +15,9 @@ import { useAuth } from '../context/AuthContext'
 import { canAccessTest } from '../lib/testAccess'
 import { recordTestResult } from '../lib/testResults'
 import { extraTests } from '../data/extraTests'
+import PracticeStyleRoot from './PracticeStyleRoot'
+import PracticeStylePicker from './PracticeStylePicker'
+import ZoomControls from './ZoomControls'
 
 function GenericMockTest() {
   const navigate = useNavigate()
@@ -329,23 +332,27 @@ function GenericMockTest() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-4">
+    <PracticeStyleRoot className="min-h-screen py-6 px-4">
       <Seo title={`${config.title} 2026 | Free Practice Questions & Answers`} description={`Free ${config.title} with real ECS-style questions, instant answers and explanations.`} path={location.pathname} />
       <div className="container mx-auto max-w-4xl">
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="ps-card p-6 mb-6">
           <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              <h1 className="text-2xl font-bold flex items-center gap-2">
                 {config.icon} {config.title}
               </h1>
-              <p className="text-gray-500 text-sm mt-1">{questions.length} questions | Pass mark: {Math.round(passMark * 100)}%</p>
+              <p className="ps-muted text-sm mt-1">{questions.length} questions | Pass mark: {Math.round(passMark * 100)}%</p>
             </div>
-            <div className={`rounded-xl px-5 py-3 text-center ${getTimerBgColor()}`}>
-              <div className={`text-3xl font-bold ${getTimerColor()} flex items-center gap-2`}>
-                <FaClock className="text-xl" />
-                {formatTime(timeLeft)}
+            <div className="flex items-center gap-3">
+              <div className={`rounded-xl px-5 py-3 text-center ${getTimerBgColor()}`}>
+                <div className={`text-3xl font-bold ${getTimerColor()} flex items-center gap-2`}>
+                  <FaClock className="text-xl" />
+                  {formatTime(timeLeft)}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Time Remaining</p>
               </div>
-              <p className="text-xs text-gray-500 mt-1">Time Remaining</p>
+              <PracticeStylePicker />
+              <ZoomControls />
             </div>
           </div>
 
@@ -384,23 +391,23 @@ function GenericMockTest() {
             )
           )}
 
-          <div className="mb-2 flex justify-between text-sm text-gray-600">
+          <div className="mb-2 flex justify-between text-sm ps-muted">
             <span>Question {currentIndex + 1} of {questions.length}</span>
-            <span>Score: <span className="font-bold text-green-600">{score}</span> / {questions.length}</span>
+            <span>Score: <span className="font-bold ps-accent-text">{score}</span> / {questions.length}</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-full h-3 transition-all duration-500 ease-out" style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }} />
+          <div className="w-full ps-progress-track rounded-full h-3 overflow-hidden">
+            <div className="ps-progress-fill rounded-full h-3 transition-all duration-500 ease-out" style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }} />
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="ps-card overflow-hidden">
           <div className="p-6 md:p-8">
             <div className="mb-4 flex justify-between items-center">
-              <span className="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-medium">
+              <span className="ps-badge inline-block text-xs px-3 py-1 rounded-full font-medium">
                 Question #{currentIndex + 1}
               </span>
-              <span className="text-xs text-gray-400 flex items-center gap-1">
-                <FaCheckCircle className="text-green-500" /> {config.title}
+              <span className="text-xs ps-muted flex items-center gap-1">
+                <FaCheckCircle className="ps-accent-text" /> {config.title}
               </span>
             </div>
 
@@ -420,17 +427,15 @@ function GenericMockTest() {
             <div className="space-y-3">
               {currentQ.options.map((option, idx) => {
                 const letters = ['A', 'B', 'C', 'D']
-                let optionClass = 'w-full text-left p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer flex items-center gap-3'
+                let optionClass = 'w-full text-left p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer flex items-center gap-3 ps-option'
                 if (showResult) {
-                  if (option === currentQ.correct) optionClass += ' bg-green-50 border-green-500 shadow-sm'
-                  else if (selectedAnswer === option && option !== currentQ.correct) optionClass += ' bg-red-50 border-red-500'
-                  else optionClass += ' border-gray-200 bg-gray-50 opacity-60'
-                } else {
-                  optionClass += ' hover:border-green-500 hover:bg-green-50 border-gray-200 hover:shadow-md'
+                  if (option === currentQ.correct) optionClass += ' ps-option-correct'
+                  else if (selectedAnswer === option && option !== currentQ.correct) optionClass += ' ps-option-incorrect'
+                  else optionClass += ' ps-option-faded'
                 }
                 return (
                   <button key={idx} onClick={() => !showResult && handleAnswer(option)} className={optionClass} disabled={showResult}>
-                    <span className={`font-bold w-8 h-8 flex items-center justify-center rounded-full ${showResult && option === currentQ.correct ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                    <span className="ps-option-letter font-bold w-8 h-8 flex items-center justify-center rounded-full">
                       {letters[idx]}
                     </span>
                     <span className="flex-1">{option}</span>
@@ -442,17 +447,17 @@ function GenericMockTest() {
             </div>
 
             {showResult && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+              <div className="mt-6 p-4 ps-badge rounded-xl">
                 <div className="flex items-center gap-2 mb-2">
-                  <FaLightbulb className="text-blue-600 text-lg" />
-                  <span className="font-semibold text-blue-800">Explanation</span>
+                  <FaLightbulb className="text-lg" />
+                  <span className="font-semibold">Explanation</span>
                 </div>
-                <p className="text-gray-700">{currentQ.explanation}</p>
+                <p>{currentQ.explanation}</p>
                 <AIExplainButton
                   explanation={currentQ.explanation}
                   topic={config.title}
                 />
-                <button onClick={nextQuestion} className="mt-4 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition w-full font-semibold flex items-center justify-center gap-2">
+                <button onClick={nextQuestion} className="ps-cta mt-4 px-6 py-2.5 rounded-xl hover:shadow-lg transition w-full font-semibold flex items-center justify-center gap-2">
                   {currentIndex + 1 < questions.length ? 'Next Question' : 'See Results'}
                   <FaArrowRight />
                 </button>
@@ -472,7 +477,7 @@ function GenericMockTest() {
           </Link>
         </div>
       </div>
-    </div>
+    </PracticeStyleRoot>
   )
 }
 

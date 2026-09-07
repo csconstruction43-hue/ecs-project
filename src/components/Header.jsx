@@ -45,7 +45,19 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isAnnouncementDismissed, setIsAnnouncementDismissed] = useState(
+    () => typeof window !== 'undefined' && localStorage.getItem('announcementDismissed') === 'true'
+  )
   const { user, isPro, logout } = useAuth()
+
+  const dismissAnnouncement = () => {
+    setIsAnnouncementDismissed(true)
+    try {
+      localStorage.setItem('announcementDismissed', 'true')
+    } catch {
+      // localStorage unavailable (private mode etc.) — dismissal just won't persist
+    }
+  }
   const navigate = useNavigate()
   const location = useLocation()
   const dropdownRef = useRef(null)
@@ -134,13 +146,21 @@ const Header = () => {
   return (
     <>
       {/* Announcement bar */}
-      {!isPro && (
-        <div className="bg-gradient-to-r from-blue-500 to-secondary text-white text-center py-2 px-4 text-sm font-medium">
-          <span className="inline-flex items-center gap-2">
+      {!isPro && !isAnnouncementDismissed && (
+        <div className="relative bg-gradient-to-r from-blue-500 to-secondary text-white text-center py-2 px-10 text-sm font-medium">
+          <span className="inline-flex items-center gap-2 flex-wrap justify-center">
             <Zap size={14} className="text-slate-300" />
             🎯 Get Pro — unlimited tests, AI explanations & analytics
             <Link to="/plans" className="underline font-bold hover:text-slate-200 transition-colors ml-1">Upgrade now →</Link>
           </span>
+          <button
+            type="button"
+            onClick={dismissAnnouncement}
+            aria-label="Dismiss announcement"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors"
+          >
+            <X size={16} />
+          </button>
         </div>
       )}
 

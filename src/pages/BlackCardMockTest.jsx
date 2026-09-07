@@ -7,6 +7,9 @@ import TestTimer from '../components/TestTimer'
 import LockedTestScreen from '../components/LockedTestScreen'
 import { useAuth } from '../context/AuthContext'
 import { canAccessTest } from '../lib/testAccess'
+import PracticeStyleRoot from '../components/PracticeStyleRoot'
+import PracticeStylePicker from '../components/PracticeStylePicker'
+import ZoomControls from '../components/ZoomControls'
 
 function BlackCardMockTest() {
   const navigate = useNavigate()
@@ -519,6 +522,7 @@ function BlackCardMockTest() {
   }
 
   return (
+    <PracticeStyleRoot>
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} py-8 transition-colors duration-300`}>
       <Seo title="ECS Black Card Mock Test 2026 | Advanced Craft & Supervisory Practice" description="Free ECS Black Card mock test for supervisors and advanced craft workers. Practice ECS-style HS&E questions with instant feedback." path="/ecs-black-card-mock-test" />
       <div className="container-custom max-w-5xl mx-auto px-4">
@@ -576,7 +580,9 @@ function BlackCardMockTest() {
                 </div>
 
                 {/* Display Settings */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  <PracticeStylePicker />
+                  <ZoomControls />
                   <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-lg border hover:bg-gray-50" title="Dark Mode">
                     {darkMode ? '☀️' : '🌙'}
                   </button>
@@ -615,9 +621,17 @@ function BlackCardMockTest() {
                 {isPremium && topicFilter !== 'all' && ` | ${topics.find(t => t.id === topicFilter)?.icon} ${topics.find(t => t.id === topicFilter)?.name}`}
               </p>
             </div>
-            {selectedExamMode === 'timed' && (
-              <TestTimer duration={1800} onTimeEnd={handleTimeEnd} onTimeUpdate={setTimeRemaining} />
-            )}
+            <div className="flex items-center gap-3">
+              {selectedExamMode === 'timed' && (
+                <TestTimer duration={1800} onTimeEnd={handleTimeEnd} onTimeUpdate={setTimeRemaining} />
+              )}
+              {!isPremium && (
+                <>
+                  <PracticeStylePicker />
+                  <ZoomControls />
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -726,6 +740,7 @@ function BlackCardMockTest() {
         </div>
       )}
     </div>
+    </PracticeStyleRoot>
   )
 }
 

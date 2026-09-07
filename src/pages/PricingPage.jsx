@@ -87,7 +87,7 @@ function PricingPage() {
 
       <div className="container mx-auto max-w-6xl px-4 -mt-16 pb-16">
         {/* Pricing Cards Grid */}
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-16">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {PLAN_LIST.map((plan) => (
             <div
               key={plan.id}
@@ -133,12 +133,10 @@ function PricingPage() {
                 {isPro && plan.id !== 'free' ? 'Manage plan' : plan.buttonText}
               </Link>
 
-              {plan.id === 'monthly' && (
-                <p className="text-xs text-blue-600 mt-3 font-medium">Save ~{savingPct}% vs Weekly</p>
-              )}
-              {plan.id === 'lifetime' && (
-                <p className="text-xs text-blue-600 mt-3 font-medium">Pays for itself in {breakEvenMonths} months</p>
-              )}
+              <p className="text-xs text-blue-600 mt-3 font-medium min-h-[16px]">
+                {plan.id === 'monthly' && `Save ~${savingPct}% vs Weekly`}
+                {plan.id === 'lifetime' && `Pays for itself in ${breakEvenMonths} months`}
+              </p>
             </div>
           ))}
         </div>

@@ -7,6 +7,9 @@ import QuestionAudio from '../components/QuestionAudio'
 import LockedTestScreen from '../components/LockedTestScreen'
 import { useAuth } from '../context/AuthContext'
 import { canAccessTest } from '../lib/testAccess'
+import PracticeStyleRoot from '../components/PracticeStyleRoot'
+import PracticeStylePicker from '../components/PracticeStylePicker'
+import ZoomControls from '../components/ZoomControls'
 
 function SkilledWorkerTest() {
   const navigate = useNavigate()
@@ -218,7 +221,8 @@ function SkilledWorkerTest() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <PracticeStyleRoot className="min-h-screen py-6 px-4">
+    <div className="container mx-auto max-w-4xl">
       <Seo title="ECS Skilled Worker Mock Test 2026 | Free ECS Practice Questions" description="Practice the ECS Skilled Worker mock test free online. Real ECS-style HS&E questions, instant answers and explanations to help you pass first time." path="/ecs-skilled-worker-test" />
       {/* Premium Banner for Non-Premium */}
       {!isPremium && (
@@ -303,24 +307,28 @@ function SkilledWorkerTest() {
       </div>
 
       {/* Mock Test Section */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <div className="border-b pb-3 mb-4">
-          <div className="flex justify-between items-center">
+      <div className="ps-card p-6">
+        <div className="border-b pb-3 mb-4" style={{ borderColor: 'var(--ps-option-border, #e5e7eb)' }}>
+          <div className="flex justify-between items-center flex-wrap gap-3">
             <h2 className="text-xl font-bold">Blue Card Mock Test</h2>
-            {isPremium && (
-              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                {topicFilter !== 'all' ? topicFilter : `${questions.length} questions`}
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {isPremium && (
+                <span className="ps-badge text-xs px-2 py-1 rounded-full">
+                  {topicFilter !== 'all' ? topicFilter : `${questions.length} questions`}
+                </span>
+              )}
+              <PracticeStylePicker />
+              <ZoomControls />
+            </div>
           </div>
-          <p className="text-gray-500 text-sm">Question {currentIndex + 1} of {questions.length}</p>
-          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <p className="ps-muted text-sm">Question {currentIndex + 1} of {questions.length}</p>
+          <div className="w-full ps-progress-track rounded-full h-2 mt-2 overflow-hidden">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="ps-progress-fill h-2 rounded-full transition-all duration-300"
               style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
             ></div>
           </div>
-          <div className="text-right text-sm text-gray-500 mt-1">
+          <div className="text-right text-sm ps-muted mt-1">
             Score: {score}/{questions.length}
           </div>
         </div>
@@ -333,12 +341,12 @@ function SkilledWorkerTest() {
             <button
               key={idx}
               onClick={() => !showResult && handleAnswer(option)}
-              className={`w-full text-left p-3 rounded-lg border transition-all ${
+              className={`w-full text-left p-3 rounded-lg border-2 transition-all ps-option ${
                 showResult && option === currentQ.correct
-                  ? 'bg-green-100 border-green-500'
+                  ? 'ps-option-correct'
                   : showResult && option === selectedAnswer && option !== currentQ.correct
-                  ? 'bg-red-100 border-red-500'
-                  : 'hover:bg-gray-50 border-gray-200'
+                  ? 'ps-option-incorrect'
+                  : ''
               }`}
               disabled={showResult}
             >
@@ -348,18 +356,18 @@ function SkilledWorkerTest() {
         </div>
         
         {showResult && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className={selectedAnswer === currentQ.correct ? "text-green-700 font-semibold" : "text-red-700 font-semibold"}>
+          <div className="mt-6 p-4 ps-badge rounded-lg" style={{ background: 'var(--ps-option-hover-bg, #eff6ff)' }}>
+            <p className={selectedAnswer === currentQ.correct ? "font-semibold" : "font-semibold"} style={{ color: selectedAnswer === currentQ.correct ? 'var(--ps-correct-border, #15803d)' : 'var(--ps-incorrect-border, #b91c1c)' }}>
               {selectedAnswer === currentQ.correct ? "✓ Correct!" : "✗ Incorrect!"}
             </p>
-            <p className="text-gray-600 mt-1 text-sm">
+            <p className="ps-muted mt-1 text-sm">
               <span className="font-semibold">Explanation:</span> {currentQ.explanation}
             </p>
             <AIExplainButton
               explanation={currentQ.explanation}
               topic="ECS Skilled Worker Test"
             />
-            <button onClick={nextQuestion} className="mt-3 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+            <button onClick={nextQuestion} className="ps-cta mt-3 px-6 py-2 rounded-lg transition">
               {currentIndex + 1 === questions.length ? "Finish Test" : "Next →"}
             </button>
           </div>
@@ -410,6 +418,7 @@ function SkilledWorkerTest() {
         </Link>
       </div>
     </div>
+    </PracticeStyleRoot>
   )
 }
 

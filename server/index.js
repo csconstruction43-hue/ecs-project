@@ -93,7 +93,10 @@ const transporter = nodemailer.createTransport({
 })
 
 async function sendEmail({ to, subject, html, attachments }) {
-  if (!SMTP_USER) { console.log('[Email skipped — no SMTP_USER]', subject, 'to', to); return }
+  if (!SMTP_USER) { 
+    if (process.env.DEBUG) console.log('[Email skipped — no SMTP_USER]', subject, 'to', to); 
+    return 
+  }
   try {
     await transporter.sendMail({ from: `"ECSPrep" <${FROM_EMAIL}>`, to, subject, html, attachments })
   } catch (e) { console.error('Email failed:', e.message) }
@@ -105,7 +108,7 @@ async function sendEmail({ to, subject, html, attachments }) {
 // and moves on rather than breaking whatever called it.
 async function sendSms({ to, body }) {
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_FROM_NUMBER) {
-    console.log('[SMS skipped — Twilio not configured]', 'to', to, '-', body)
+    if (process.env.DEBUG) console.log('[SMS skipped — Twilio not configured]', 'to', to, '-', body)
     return
   }
   try {
@@ -639,7 +642,13 @@ async function getPublicSettings() {
 // Public: anyone (including logged-out visitors) can read the current
 // toggles/theme, so the frontend knows what to show before login.
 app.get('/api/settings/public', async (req, res) => {
-  res.json(await getPublicSettings())
+  try {
+    const settings = await getPublicSettings()
+    res.json(settings)
+  } catch (error) {
+    console.error('Error fetching public settings:', error.message)
+    res.status(500).json({ error: 'Failed to fetch settings' })
+  }
 })
 
 // Admin-only: update one or more toggles/theme at once. Regular users are
