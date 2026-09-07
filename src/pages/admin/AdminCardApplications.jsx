@@ -8,6 +8,58 @@ import React, { useEffect, useState } from 'react'
 import { CreditCard, Loader2, Mail, Phone, Eye, X, FileText, Download } from 'lucide-react'
 import { apiRequest } from '../../lib/api'
 
+// Client-side download of a plain-text summary of everything the candidate
+// submitted — the uploaded documents themselves are already individually
+// downloadable from their tiles below, this covers the typed-in fields.
+function downloadTextFile(filename, content) {
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildApplicationText(app) {
+  const line = (label, value) => (value ? `${label}: ${value}\n` : '')
+  let out = `ECS CARD APPLICATION\n`
+  out += `Submitted: ${new Date(app.createdAt).toLocaleString('en-GB')}\n`
+  out += `Application ID: ${app.id}\n\n`
+  out += `-- Personal details --\n`
+  out += line('Full name', app.fullName)
+  out += line('Date of birth', app.dob)
+  out += line('NI number', app.niNumber)
+  out += line('Gender', app.gender)
+  out += `\n-- Contact & address --\n`
+  out += line('Email', app.email)
+  out += line('Mobile', app.phone)
+  out += line('Street address', app.streetAddress)
+  out += line('Town / City', app.townCity)
+  out += line('Postcode', app.postcode)
+  out += `\n-- Application --\n`
+  out += line('Application type', app.applicationType)
+  if (app.applicationType === 'Renewal') {
+    out += line('Previous card number', app.previousCardNumber)
+    out += line('Previous expiry date', app.previousExpiryDate)
+  }
+  out += line('Card type', app.cardType)
+  out += line('Job title / occupation', app.jobTitle)
+  out += line('Employer', app.employer)
+  out += line('Qualification', app.qualification)
+  out += line('Passed H&S/HS&E test?', app.hasPassedTest)
+  out += line('Current stage', stageMeta(app.stage).label)
+  if (app.notes) out += `\n-- Notes from candidate --\n${app.notes}\n`
+  out += `\n-- Documents --\n`
+  out += `Passport photo: ${app.documents?.passportPhoto ? app.documents.passportPhoto.filename : 'Not provided'}\n`
+  out += `Identity proof: ${app.documents?.idProof ? app.documents.idProof.filename : 'Not provided'}\n`
+  out += `H&S/HS&E proof: ${app.documents?.hseProof ? app.documents.hseProof.filename : 'Not provided'}\n`
+  out += `(Download the documents themselves from the "Uploaded documents" tiles in the app.)\n`
+  return out
+}
+
 const STAGES = [
   { value: 'submitted', label: 'Submitted', className: 'bg-blue-50 text-blue-700 border-blue-200' },
   { value: 'documents_verified', label: 'Docs verified', className: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
@@ -210,11 +262,19 @@ const AdminCardApplications = () => {
             className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">Full Application — {viewFullApp.fullName}</h2>
-              <button onClick={() => setViewFullId(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
-                <X size={20} />
-              </button>
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-gray-900 truncate">Full Application — {viewFullApp.fullName}</h2>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => downloadTextFile(`ECS-Card-Application-${viewFullApp.fullName.replace(/\s+/g, '-')}.txt`, buildApplicationText(viewFullApp))}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-purple-200 text-purple-700 bg-purple-50 hover:bg-purple-100 transition"
+                >
+                  <Download size={13} /> Download
+                </button>
+                <button onClick={() => setViewFullId(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             <div className="p-6 space-y-6">

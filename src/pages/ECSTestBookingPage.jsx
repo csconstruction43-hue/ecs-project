@@ -32,9 +32,9 @@ const TEST_CATEGORIES = [
   'Not sure — please advise me',
 ]
 
-const TEST_FEE = 45
+const TEST_FEE = 64
 const ASSIST_FEE = 15
-const TOTAL_FEE = 60
+const TOTAL_FEE = 79
 const money = (n) => `£${n.toFixed(2)}`
 
 const initialForm = {

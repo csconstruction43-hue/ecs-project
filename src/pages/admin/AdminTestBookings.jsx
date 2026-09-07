@@ -5,8 +5,40 @@
 // nothing was tracked here in the admin panel. Mirrors AdminCardApplications.jsx
 // so every booking (test AND card) reaches the admin, not just an inbox.
 import React, { useEffect, useState } from 'react'
-import { ClipboardCheck, Loader2, Mail, Phone, MapPin, Calendar } from 'lucide-react'
+import { ClipboardCheck, Loader2, Mail, Phone, MapPin, Calendar, Eye, X, Download } from 'lucide-react'
 import { apiRequest } from '../../lib/api'
+
+// Client-side download of a plain-text summary of everything the candidate
+// submitted for this test booking.
+function downloadTextFile(filename, content) {
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildBookingText(booking) {
+  const line = (label, value) => (value ? `${label}: ${value}\n` : '')
+  let out = `ECS TEST BOOKING\n`
+  out += `Submitted: ${new Date(booking.createdAt).toLocaleString('en-GB')}\n`
+  out += `Booking ID: ${booking.id}\n\n`
+  out += `-- Candidate details --\n`
+  out += line('Full name', booking.fullName)
+  out += line('Email', booking.email)
+  out += line('Mobile', booking.phone)
+  out += `\n-- Test booking --\n`
+  out += line('Test category', booking.testCategory)
+  out += line('Preferred test centre / area', booking.preferredCentre)
+  out += line('Preferred date', booking.preferredDate)
+  out += line('Current status', statusMeta(booking.status).label)
+  if (booking.notes) out += `\n-- Notes from candidate --\n${booking.notes}\n`
+  return out
+}
 
 const STATUSES = [
   { value: 'new', label: 'New', className: 'bg-blue-50 text-blue-700 border-blue-200' },
@@ -28,6 +60,7 @@ const AdminTestBookings = () => {
   const [selectedId, setSelectedId] = useState(null)
   const [noteDraft, setNoteDraft] = useState('')
   const [saving, setSaving] = useState(false)
+  const [viewFullId, setViewFullId] = useState(null)
 
   const load = async () => {
     setLoading(true)
@@ -45,6 +78,7 @@ const AdminTestBookings = () => {
   useEffect(() => { load() }, [])
 
   const selected = bookings.find((b) => b.id === selectedId) || null
+  const viewFullBooking = bookings.find((b) => b.id === viewFullId) || null
 
   const visible = bookings.filter((b) => filter === 'all' || b.status === filter)
   const newCount = bookings.filter((b) => b.status === 'new').length
@@ -128,17 +162,27 @@ const AdminTestBookings = () => {
             ) : (
               <div>
                 <div className="mb-4">
-                  <p className="font-semibold text-gray-900 text-lg">{selected.fullName}</p>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-500">
-                    <a href={`mailto:${selected.email}`} className="flex items-center gap-1 text-blue-600"><Mail size={13} /> {selected.email}</a>
-                    {selected.phone && <span className="flex items-center gap-1"><Phone size={13} /> {selected.phone}</span>}
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-gray-900 text-lg">{selected.fullName}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-500">
+                        <a href={`mailto:${selected.email}`} className="flex items-center gap-1 text-blue-600"><Mail size={13} /> {selected.email}</a>
+                        {selected.phone && <span className="flex items-center gap-1"><Phone size={13} /> {selected.phone}</span>}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span>{selected.testCategory}</span>
+                        {selected.preferredCentre && <span className="flex items-center gap-1"><MapPin size={12} /> {selected.preferredCentre}</span>}
+                        {selected.preferredDate && <span className="flex items-center gap-1"><Calendar size={12} /> {selected.preferredDate}</span>}
+                      </p>
+                      {selected.notes && <p className="text-sm text-gray-600 mt-2 italic">"{selected.notes}"</p>}
+                    </div>
+                    <button
+                      onClick={() => setViewFullId(selected.id)}
+                      className="shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition"
+                    >
+                      <Eye size={14} /> View Full Details
+                    </button>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span>{selected.testCategory}</span>
-                    {selected.preferredCentre && <span className="flex items-center gap-1"><MapPin size={12} /> {selected.preferredCentre}</span>}
-                    {selected.preferredDate && <span className="flex items-center gap-1"><Calendar size={12} /> {selected.preferredDate}</span>}
-                  </p>
-                  {selected.notes && <p className="text-sm text-gray-600 mt-2 italic">"{selected.notes}"</p>}
                 </div>
 
                 <div className="mb-5">
@@ -185,6 +229,88 @@ const AdminTestBookings = () => {
           </div>
         </div>
       )}
+
+      {/* Full booking detail modal — same everything-the-candidate-submitted
+          view as AdminCardApplications.jsx, for consistency across both
+          booking types. */}
+      {viewFullBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={() => setViewFullId(null)}>
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-gray-900 truncate">Full Booking — {viewFullBooking.fullName}</h2>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => downloadTextFile(`ECS-Test-Booking-${viewFullBooking.fullName.replace(/\s+/g, '-')}.txt`, buildBookingText(viewFullBooking))}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition"
+                >
+                  <Download size={13} /> Download
+                </button>
+                <button onClick={() => setViewFullId(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <Section title="Candidate details">
+                <DetailRow label="Full name" value={viewFullBooking.fullName} />
+                <DetailRow label="Email" value={viewFullBooking.email} />
+                <DetailRow label="Mobile" value={viewFullBooking.phone} />
+              </Section>
+
+              <Section title="Test booking">
+                <DetailRow label="Test category" value={viewFullBooking.testCategory} />
+                <DetailRow label="Preferred test centre / area" value={viewFullBooking.preferredCentre} />
+                <DetailRow label="Preferred date" value={viewFullBooking.preferredDate} />
+                <DetailRow label="Status" value={statusMeta(viewFullBooking.status).label} />
+                <DetailRow label="Submitted" value={new Date(viewFullBooking.createdAt).toLocaleString('en-GB')} />
+              </Section>
+
+              {viewFullBooking.notes && (
+                <Section title="Notes from candidate">
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{viewFullBooking.notes}</p>
+                </Section>
+              )}
+
+              <Section title="Status timeline">
+                <ul className="space-y-2">
+                  {(viewFullBooking.statusHistory || []).slice().reverse().map((h, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm">
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border shrink-0 ${statusMeta(h.status).className}`}>
+                        {statusMeta(h.status).label}
+                      </span>
+                      <span className="text-gray-400 text-xs">{new Date(h.at).toLocaleString('en-GB')}</span>
+                      {h.note && <span className="text-gray-600 text-xs italic">— {h.note}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Section({ title, children }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{title}</p>
+      <div className="space-y-1.5">{children}</div>
+    </div>
+  )
+}
+
+function DetailRow({ label, value }) {
+  if (!value) return null
+  return (
+    <div className="flex flex-wrap gap-x-2 text-sm">
+      <span className="text-gray-500 min-w-[160px]">{label}</span>
+      <span className="text-gray-900 font-medium">{value}</span>
     </div>
   )
 }

@@ -3056,7 +3056,7 @@ function testBookingEmailHtml({ fullName, email, phone, testCategory, preferredC
           ${row('Test category', testCategory)}
           ${row('Preferred test centre / area', preferredCentre)}
           ${row('Preferred date', preferredDate)}
-          ${row('Fee', `£45.00 test fee + £15.00 booking assistance = £60.00 total`)}
+          ${row('Fee', `£64.00 test fee + £15.00 booking assistance = £79.00 total`)}
           ${row('Notes', notes)}
         </table>
       </td></tr>

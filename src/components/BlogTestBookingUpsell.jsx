@@ -83,7 +83,7 @@ function BlogTestBookingUpsell() {
           Book Your ECS Test →
         </Link>
         <p className="text-sm text-gray-600">
-          <span className="font-bold text-gray-900">£60</span> total — test fee + booking assistance
+          <span className="font-bold text-gray-900">£79</span> total — test fee + booking assistance
         </p>
       </div>
     </div>

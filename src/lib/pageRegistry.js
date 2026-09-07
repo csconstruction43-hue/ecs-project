@@ -14,6 +14,8 @@ const PAGE_REGISTRY = [
   { key: 'certificate', title: 'Certificate', path: '/certificate' },
   { key: 'book', title: 'Book', path: '/book' },
   { key: 'ecs-card-info', title: 'ECS Card Info', path: '/ecs-card-info' },
+  { key: 'ecs-card-booking', title: 'Book Your ECS Card', path: '/ecscardbooking' },
+  { key: 'ecs-test-booking', title: 'Book Your ECS Test', path: '/ecstestbooking' },
   { key: 'which-ecs-card', title: 'Which ECS Card Do I Need? (Wizard)', path: '/which-ecs-card' },
   { key: 'exam-day-checklist', title: 'Exam Day Checklist', path: '/exam-day-checklist' },
   { key: 'safety-signs', title: 'Safety Signs', path: '/safety-signs' },

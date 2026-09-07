@@ -43,6 +43,24 @@ const AdminUsers = () => {
 
   const [downloadingId, setDownloadingId] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
+  const [suspendingId, setSuspendingId] = useState(null)
+
+  // Quick per-row Block/Unblock — same suspend endpoint used on the detail
+  // page and in bulk actions, just one click from the list without opening
+  // the user's profile first.
+  const toggleUserBlock = async (user, suspended) => {
+    if (suspended && !window.confirm(`Block ${user.name || user.email}? They'll be signed out and blocked from logging in immediately.`)) return
+    setSuspendingId(user.id)
+    setError('')
+    try {
+      const data = await apiRequest(`/api/admin/users/${user.id}/suspend`, { method: 'PATCH', body: { suspended } })
+      setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, ...data.user } : u)))
+    } catch (err) {
+      setError(err.message || 'Could not update this user\'s status.')
+    } finally {
+      setSuspendingId(null)
+    }
+  }
 
   const changePlan = async (user, plan) => {
     setUpdatingId(user.id)
@@ -186,14 +204,14 @@ const AdminUsers = () => {
               disabled={bulkWorking}
               className="flex items-center gap-1.5 bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
             >
-              {bulkWorking ? <Loader2 size={14} className="animate-spin" /> : <ShieldOff size={14} />} Suspend
+              {bulkWorking ? <Loader2 size={14} className="animate-spin" /> : <ShieldOff size={14} />} Block
             </button>
             <button
               onClick={() => bulkSuspend(false)}
               disabled={bulkWorking}
               className="flex items-center gap-1.5 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
             >
-              {bulkWorking ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />} Reinstate
+              {bulkWorking ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />} Unblock
             </button>
             <button onClick={() => setSelectedIds([])} className="text-indigo-700 text-sm hover:underline">Clear</button>
           </div>
@@ -315,6 +333,29 @@ const AdminUsers = () => {
                         {downloadingId === user.id ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                         Download
                       </button>
+                      {user.role !== 'admin' && (
+                        user.suspended ? (
+                          <button
+                            onClick={() => toggleUserBlock(user, false)}
+                            disabled={suspendingId === user.id}
+                            className="text-green-600 hover:text-green-800 flex items-center gap-1 text-sm disabled:opacity-50"
+                            title="Unblock this user — restores login access"
+                          >
+                            {suspendingId === user.id ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
+                            Unblock
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => toggleUserBlock(user, true)}
+                            disabled={suspendingId === user.id}
+                            className="text-red-600 hover:text-red-800 flex items-center gap-1 text-sm disabled:opacity-50"
+                            title="Block this user — signs them out and stops them logging in"
+                          >
+                            {suspendingId === user.id ? <Loader2 size={16} className="animate-spin" /> : <ShieldOff size={16} />}
+                            Block
+                          </button>
+                        )
+                      )}
                     </div>
                   </td>
                 </tr>

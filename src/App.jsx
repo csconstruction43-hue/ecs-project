@@ -258,9 +258,9 @@ function App() {
           <Route path="leaderboard" element={<PageVisibilityGate pageKey="leaderboard" title="Leaderboard"><LeaderboardPage /></PageVisibilityGate>} />
           <Route path="certificate" element={<ProtectedRoute requirePro><PageVisibilityGate pageKey="certificate" title="Certificate"><CertificatePage /></PageVisibilityGate></ProtectedRoute>} />
           <Route path="book" element={<PageVisibilityGate pageKey="book" title="Book"><BookPage /></PageVisibilityGate>} />
-          <Route path="ecscardbooking" element={<ECSCardBookingPage />} />
+          <Route path="ecscardbooking" element={<PageVisibilityGate pageKey="ecs-card-booking" title="Book Your ECS Card"><ECSCardBookingPage /></PageVisibilityGate>} />
           <Route path="my-card-application" element={<ProtectedRoute><AppShell><CardApplicationTrackerPage /></AppShell></ProtectedRoute>} />
-          <Route path="ecstestbooking" element={<ECSTestBookingPage />} />
+          <Route path="ecstestbooking" element={<PageVisibilityGate pageKey="ecs-test-booking" title="Book Your ECS Test"><ECSTestBookingPage /></PageVisibilityGate>} />
           <Route path="test-centre-finder" element={<TestCentreFinderPage />} />
           <Route path="card-renewal-reminder" element={<ProtectedRoute><AppShell><CardRenewalReminderPage /></AppShell></ProtectedRoute>} />
           <Route path="cards" element={<CardsPage />} />
