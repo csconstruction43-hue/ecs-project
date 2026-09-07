@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Seo, { faqSchema, organizationSchema, websiteSchema, quizSchema } from '../components/Seo';
+import HomeFestivalBanner from '../components/HomeFestivalBanner';
 import { 
   ArrowRight, 
   CheckCircle, 
@@ -47,7 +48,7 @@ const HomePage = () => {
     {
       icon: <FileText className="w-6 h-6 text-blue-600" />,
       title: "3000+ Questions",
-      description: "All 11 ECS topics covered with real exam-style questions updated for 2026"
+      description: "All 11 HSE syllabus topics covered with real exam-style questions updated for 2026"
     },
     {
       icon: <Clock className="w-6 h-6 text-blue-600" />,
@@ -177,7 +178,7 @@ const HomePage = () => {
         'Lifetime updates'
       ],
       buttonText: 'Buy Now',
-      buttonClass: 'bg-green-600 hover:bg-green-700 text-white',
+      buttonClass: 'bg-blue-600 hover:bg-blue-700 text-white',
       bestValue: true
     }
   ];
@@ -246,6 +247,7 @@ const HomePage = () => {
           }),
         ]}
       />
+      <HomeFestivalBanner />
       {/* Hero Section — Total Skills-style dark hero with trust badges & stat strip */}
       <section className="relative bg-gradient-to-br from-secondary via-slate-900 to-blue-950 text-white overflow-hidden">
         {/* Decorative circuit pattern + glow, standing in for a workshop photo */}
@@ -527,7 +529,7 @@ const HomePage = () => {
           <div className="mt-8 text-center text-sm text-gray-500">
             <p>Built for UK construction workers • Updated for the 2026 ECS test • Free, start in 30 seconds</p>
             <p className="mt-2 text-xs text-gray-400">
-              ECSMockTest.uk is not affiliated with ECS, ECS, or any official scheme.
+              ECSPrep is not affiliated with ECS, JIB, or any official scheme.
             </p>
           </div>
         </div>
@@ -620,7 +622,7 @@ const HomePage = () => {
             <div className="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-lg transition">
               <ShieldCheck className="w-8 h-8 text-blue-600 mb-3" />
               <h4 className="font-semibold text-gray-900 mb-2">Independent revision tool</h4>
-              <p className="text-gray-700 text-sm">We're not affiliated with ECS or ECS — just a straightforward revision resource for construction workers.</p>
+              <p className="text-gray-700 text-sm">We're not affiliated with ECS or JIB — just a straightforward revision resource for construction workers.</p>
             </div>
           </div>
         </div>
@@ -663,7 +665,7 @@ const HomePage = () => {
                 key={index}
                 className={`relative bg-white rounded-2xl p-6 border-2 transition-all hover:shadow-xl ${
                   plan.popular ? 'border-blue-500 shadow-md' : 'border-gray-200'
-                } ${plan.bestValue ? 'border-green-500' : ''}`}
+                } ${plan.bestValue ? 'border-blue-500' : ''}`}
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-4 py-1 rounded-full">
@@ -671,7 +673,7 @@ const HomePage = () => {
                   </div>
                 )}
                 {plan.bestValue && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs font-bold px-4 py-1 rounded-full">
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-4 py-1 rounded-full">
                     Best Value
                   </div>
                 )}
@@ -685,7 +687,7 @@ const HomePage = () => {
                 <ul className="space-y-2 mb-6">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="w-4 h-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -702,7 +704,7 @@ const HomePage = () => {
           </div>
           
           <div className="mt-8 text-center text-sm text-gray-500">
-            <p>7-day money-back guarantee on all paid plans. If it doesn't help you pass us within 7 days for a full refund.</p>
+            <p>7-day money-back guarantee on all paid plans. If it doesn't help you pass, email support within 7 days for a full refund.</p>
           </div>
         </div>
       </section>
@@ -755,7 +757,7 @@ const HomePage = () => {
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">23 chapters covering all 11 ECS topics</span>
+                  <span className="text-gray-700">23 chapters covering all 11 HSE syllabus topics</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />

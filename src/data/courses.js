@@ -72,7 +72,7 @@ export const courses = [
       { title: 'Full 50-question mock exam', points: ['Pearson VUE-style timed test', 'Instant marking', 'Topic-by-topic score breakdown'] },
     ],
     outcomes: [
-      'Confident on all 11 ECS syllabus topics',
+      'Confident on all 11 HSE syllabus topics',
       'Comfortable with the real 30-minute exam format',
       'Know your weak topics before you book the real test',
     ],

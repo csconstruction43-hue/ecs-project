@@ -8,6 +8,7 @@ import {
   ArrowRight, Zap, CreditCard, GraduationCap,
 } from 'lucide-react'
 import Seo, { faqSchema, breadcrumbSchema } from '../../components/Seo'
+import { CARD_CONTENT } from '../../data/ecsCardContent'
 
 const CARD = {
   name: `SLL Lighting Professional`,
@@ -26,6 +27,7 @@ const META = {
 }
 
 const CategoryIcon = ShieldCheck
+const ABOUT = CARD_CONTENT[CARD.slug] || null
 
 const colorDot = {
   green: 'bg-green-500',
@@ -42,9 +44,10 @@ const steps = [
 
 const faqs = [
     { q: `Do I need to sit a test for the SLL Lighting Professional card?`, a: `Yes. This route sits behind the Operatives or Specialist HS&E test, the same core HS&E assessment ECSPrep's mock tests are built to prepare you for.` },
-    { q: `How long does the SLL Lighting Professional card last?`, a: `5 years (1 year on the temporary Experienced Worker route), in line with the Blue / Gold Card (Skilled Worker) it belongs to. Always confirm the current rule for your exact route at ecs.uk.com.` },
+    { q: `How long does the SLL Lighting Professional card last?`, a: `5 years (1 year on the temporary Experienced Worker route), in line with the Blue / Gold Card (Skilled Worker) it belongs to. Always confirm the current rule for your exact route at ecscard.org.uk.` },
     { q: `How much does it cost?`, a: `The card fee is £57. Where the HS&E test is required, there's a separate booking fee at the test centre. Our mock tests are free.` },
     { q: `Is SLL Lighting Professional the right card for my role?`, a: `It's one of several routes under Other Specialist Routes. If you're not sure, browse the other cards in this category below or use the card finder on our ECS Cards page.` },
+    ...(ABOUT?.extraFaqs || []),
 ]
 
 function CardFaq({ item, isOpen, onToggle }) {
@@ -182,6 +185,63 @@ export default function SllLightingProfessionalPage() {
         </div>
       </section>
 
+      {/* About this role — unique, occupation-specific content (not shared boilerplate) */}
+      {ABOUT && (
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">What does a {CARD.name} actually do?</h2>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">{ABOUT.overview}</p>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Typical responsibilities</h3>
+                <ul className="space-y-2">
+                  {ABOUT.responsibilities.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 leading-relaxed">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="space-y-5">
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Who this suits</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{ABOUT.suits}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Career progression</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{ABOUT.progression}</p>
+                </div>
+              </div>
+            </div>
+
+            {(ABOUT.keySkills || ABOUT.dayToDay) && (
+              <div className="grid md:grid-cols-2 gap-8 mt-8 pt-8 border-t border-gray-100">
+                {ABOUT.keySkills && (
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Skills you'll need</h3>
+                    <ul className="space-y-2">
+                      {ABOUT.keySkills.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600 leading-relaxed">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {ABOUT.dayToDay && (
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">A day in this role</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{ABOUT.dayToDay}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Practice CTA banner */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
         <div className="bg-secondary rounded-3xl p-6 sm:p-10 text-white flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -245,7 +305,7 @@ export default function SllLightingProfessionalPage() {
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-gray-400 max-w-2xl mx-auto">
             ECSPrep is not affiliated with ECS or any official scheme. Information is provided
-            for general guidance only — always confirm your exact route and current rules at ecs.uk.com before applying.
+            for general guidance only — always confirm your exact route and current rules at ecscard.org.uk before applying.
           </p>
         </div>
       </section>

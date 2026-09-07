@@ -209,7 +209,7 @@ function GuestTestPage() {
               <ul className="text-sm text-slate-700 mt-2 text-left list-disc list-inside">
                 <li>✓ Unlimited 50-question tests</li>
                 <li>✓ AI-powered explanations</li>
-                <li>✓ All 11 ECS topics</li>
+                <li>✓ All 11 HSE topics</li>
                 <li>✓ Analytics dashboard & pass probability</li>
                 <li>✓ Practice by topic</li>
               </ul>

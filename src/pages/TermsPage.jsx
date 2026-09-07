@@ -23,7 +23,7 @@ function TermsPage() {
       <div className="prose prose-gray max-w-none space-y-6 text-gray-700 leading-relaxed">
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Who we are</h2>
-          <p>ECSPrep is an independent practice-test platform for people preparing for ECS Health, Safety & Environment tests and ECS card applications. We are not affiliated with, endorsed by, or acting on behalf of ECS or ECS.</p>
+          <p>ECSPrep is an independent practice-test platform for people preparing for ECS Health, Safety & Environment tests and ECS card applications. We are not affiliated with, endorsed by, or acting on behalf of ECS or JIB.</p>
         </section>
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Your account</h2>
@@ -31,7 +31,7 @@ function TermsPage() {
         </section>
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">3. Practice tests are not the official exam</h2>
-          <p>Our mock tests are designed to help you revise. A good score here doesn't guarantee a pass on the real ECS test, and content may differ from the official question bank. Book your official test at citb.co.uk.</p>
+          <p>Our mock tests are designed to help you revise. A good score here doesn't guarantee a pass on the real ECS test, and content may differ from the official question bank. Book your official test via MyECS at <a href="https://www.ecscard.org.uk" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">ecscard.org.uk</a>.</p>
         </section>
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Subscriptions & payments</h2>

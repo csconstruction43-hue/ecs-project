@@ -75,7 +75,7 @@ const AdminCourses = () => {
         </button>
       </div>
 
-      <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white mb-5 max-w-md">
+      <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white mb-5 max-w-md focus-within:border-primary transition-colors">
         <Search size={15} className="text-gray-400 shrink-0" />
         <input
           value={query}
@@ -113,7 +113,8 @@ const AdminCourses = () => {
                   {enrolled.length === 0 ? (
                     <p className="text-sm text-gray-400 px-4 py-4">No one has booked this course yet.</p>
                   ) : (
-                    <table className="w-full text-sm">
+                    <div className="overflow-x-auto">
+                    <table className="w-full min-w-[560px] text-sm">
                       <thead>
                         <tr className="text-left text-gray-400 text-xs uppercase tracking-wide">
                           <th className="px-4 py-2 font-medium">Learner</th>
@@ -145,6 +146,7 @@ const AdminCourses = () => {
                         ))}
                       </tbody>
                     </table>
+                    </div>
                   )}
                 </div>
               )}

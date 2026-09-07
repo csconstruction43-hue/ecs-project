@@ -6,9 +6,10 @@
 // backend to flip the user to Pro.
 import React, { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { Lock, ShieldCheck, Loader2, CheckCircle2, XCircle } from 'lucide-react'
+import { Lock, ShieldCheck, Loader2, CheckCircle2, XCircle, Tag, GraduationCap } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { PLANS as PLAN_DETAILS } from '../lib/pricingPlans'
+import { apiRequest } from '../lib/api'
 
 function CheckoutPage() {
   const [searchParams] = useSearchParams()
@@ -24,6 +25,45 @@ function CheckoutPage() {
   const [success, setSuccess] = useState(false)
   const [requesting, setRequesting] = useState(false)
   const [requestError, setRequestError] = useState('')
+
+  // New feature: coupon codes at checkout.
+  const [couponInput, setCouponInput] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState(null) // { code, type, value }
+  const [couponChecking, setCouponChecking] = useState(false)
+  const [couponError, setCouponError] = useState('')
+
+  const discountedPrice = appliedCoupon
+    ? Math.max(
+        0,
+        appliedCoupon.type === 'percent'
+          ? plan.priceValue * (1 - appliedCoupon.value / 100)
+          : plan.priceValue - appliedCoupon.value
+      )
+    : null
+
+  const applyCoupon = async () => {
+    if (!couponInput.trim()) return
+    setCouponChecking(true)
+    setCouponError('')
+    try {
+      const { coupon } = await apiRequest('/api/coupons/validate', {
+        method: 'POST',
+        body: { code: couponInput.trim(), plan: planId },
+      })
+      setAppliedCoupon(coupon)
+    } catch (err) {
+      setAppliedCoupon(null)
+      setCouponError(err.message || 'That code is not valid.')
+    } finally {
+      setCouponChecking(false)
+    }
+  }
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponInput('')
+    setCouponError('')
+  }
 
   const isPending = user?.pendingPlan === planId
 
@@ -92,7 +132,7 @@ function CheckoutPage() {
     setError('')
     setRedirecting(true)
     try {
-      await startCheckout(planId)
+      await startCheckout(planId, appliedCoupon?.code)
       // Browser navigates away to Stripe here; nothing else to do.
     } catch (err) {
       setError(err.message || 'Could not start checkout. Please try again.')
@@ -133,14 +173,68 @@ function CheckoutPage() {
               <p className="font-semibold text-gray-900">ECSPrep Pro — {plan.name}</p>
               <p className="text-sm text-gray-500">Billed {plan.period}</p>
             </div>
-            <p className="text-2xl font-bold text-blue-600">{plan.price}</p>
+            <div className="text-right">
+              {appliedCoupon ? (
+                <>
+                  <p className="text-sm text-gray-400 line-through">{plan.price}</p>
+                  <p className="text-2xl font-bold text-blue-600">£{discountedPrice.toFixed(2)}</p>
+                </>
+              ) : (
+                <p className="text-2xl font-bold text-blue-600">{plan.price}</p>
+              )}
+            </div>
           </div>
-          <ul className="space-y-2 text-sm text-gray-600 mb-6">
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500" /> Unlimited mock tests</li>
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500" /> AI-powered explanations</li>
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500" /> Full analytics dashboard</li>
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500" /> All 11 ECS topics</li>
+
+          <div className="mb-4">
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between px-4 py-2.5 bg-green-50 border border-green-200 rounded-lg text-sm">
+                <span className="flex items-center gap-1.5 text-green-700 font-medium">
+                  <Tag size={14} /> Code <span className="font-mono">{appliedCoupon.code}</span> applied — {appliedCoupon.type === 'percent' ? `${appliedCoupon.value}%` : `£${appliedCoupon.value}`} off
+                </span>
+                <button onClick={removeCoupon} className="text-green-700 hover:text-green-900 font-medium">Remove</button>
+              </div>
+            ) : (
+              <div>
+                <div className="flex gap-2">
+                  <input
+                    value={couponInput}
+                    onChange={(e) => { setCouponInput(e.target.value); setCouponError('') }}
+                    placeholder="Have a discount code?"
+                    className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono uppercase"
+                  />
+                  <button
+                    onClick={applyCoupon}
+                    disabled={couponChecking || !couponInput.trim()}
+                    className="px-4 py-2 text-sm font-semibold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    {couponChecking ? <Loader2 size={14} className="animate-spin" /> : 'Apply'}
+                  </button>
+                </div>
+                {couponError && <p className="text-xs text-red-600 mt-1.5">{couponError}</p>}
+              </div>
+            )}
+          </div>
+
+          <h3 className="text-sm font-bold text-gray-900 mb-2">What's included with {plan.name}</h3>
+          <ul className="space-y-2 text-sm text-gray-600 mb-4">
+            {plan.features.map((feature) => (
+              <li key={feature} className="flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-green-500 shrink-0" /> {feature}
+              </li>
+            ))}
           </ul>
+
+          {planId !== 'free' && (
+            <div className="flex items-start gap-2.5 bg-purple-50 border border-purple-200 rounded-xl px-4 py-3 mb-6 text-sm">
+              <GraduationCap size={18} className="text-purple-600 shrink-0 mt-0.5" />
+              <p className="text-purple-900">
+                <span className="font-semibold">Online courses included too —</span> once you're Pro, you can request any course
+                (ECS Health &amp; Safety, Level 2/3 Electrical, and more) at no extra cost. Just{' '}
+                <Link to="/courses" className="underline font-medium hover:text-purple-700">browse the catalogue</Link>{' '}
+                and request a booking — our team approves it and unlocks the full course toolkit.
+              </p>
+            </div>
+          )}
 
           <button
             onClick={handleCheckout}
@@ -153,7 +247,7 @@ function CheckoutPage() {
               </>
             ) : (
               <>
-                <Lock size={18} /> Pay {plan.price} securely with Stripe
+                <Lock size={18} /> Pay {appliedCoupon ? `£${discountedPrice.toFixed(2)}` : plan.price} securely with Stripe
               </>
             )}
           </button>

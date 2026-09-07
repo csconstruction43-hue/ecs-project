@@ -123,7 +123,7 @@ export default function AIAssistant() {
 
               {/* Input */}
               <div className="p-3 border-t border-gray-100 shrink-0">
-                <div className="flex items-end gap-2 bg-gray-50 rounded-xl px-3 py-2">
+                <div className="flex items-end gap-2 bg-gray-50 rounded-xl px-3 py-2 ring-1 ring-transparent focus-within:ring-primary/40 transition-shadow">
                   <textarea
                     ref={inputRef}
                     value={input}

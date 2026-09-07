@@ -4,16 +4,18 @@
 // Review, Analytics, Pricing, Affiliate, Settings). Mirrors the reference
 // design: white sidebar, indigo accents, plan badge + avatar at the
 // bottom, no marketing header/footer.
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutGrid, BookOpen, ClipboardList, ListChecks, XCircle, Library,
   Zap, BarChart3, Tag, Users, Settings, LogOut, Crown, Layers, RotateCcw, Trophy,
-  Shield, BookOpenCheck, Video, MessageSquare, Sparkles, CalendarDays
+  Shield, BookOpenCheck, Video, MessageSquare, Sparkles, CalendarDays, MapPin, IdCard,
+  Building2, ClipboardCheck, HelpCircle, CreditCard, Target,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import LanguageSwitcher from './LanguageSwitcher'
 import ThemeToggle from './ThemeToggle'
+import { claimDailyLoginBonus } from '../lib/gamification'
 
 const menuItems = [
   { icon: LayoutGrid, name: 'Dashboard', path: '/dashboard' },
@@ -28,6 +30,7 @@ const menuItems = [
 const revisionItems = [
   { icon: Layers, name: 'Flashcards', path: '/flashcards' },
   { icon: RotateCcw, name: 'Wrong Questions Only', path: '/revision/wrong-questions' },
+  { icon: Target, name: 'Smart Practice', path: '/smart-practice' },
   { icon: Trophy, name: 'Achievements', path: '/achievements' },
   { icon: Shield, name: 'Safety Signs', path: '/safety-signs' },
   { icon: BookOpenCheck, name: 'Study Material', path: '/study-material' },
@@ -48,6 +51,18 @@ const moreItems = [
   { icon: Users, name: 'Affiliate', path: '/affiliate' },
 ]
 
+// UK-specific candidate tools — finding a test centre and tracking card
+// renewal are both things a UK ECS candidate needs but that live outside
+// the core study/revision flow.
+const ukToolsItems = [
+  { icon: MapPin, name: 'Test Centre Finder', path: '/test-centre-finder' },
+  { icon: IdCard, name: 'Card Renewal Reminder', path: '/card-renewal-reminder' },
+  { icon: HelpCircle, name: 'Which ECS Card?', path: '/which-ecs-card' },
+  { icon: ClipboardCheck, name: 'Exam Day Checklist', path: '/exam-day-checklist' },
+  { icon: Building2, name: 'Team Card Tracker', path: '/team' },
+  { icon: CreditCard, name: 'My Card Application', path: '/my-card-application' },
+]
+
 const bottomItems = [
   { icon: Settings, name: 'Settings', path: '/settings' },
   { icon: LogOut, name: 'Sign out', path: '/signout' },
@@ -61,6 +76,23 @@ export default function AppShell({ children }) {
   const isActive = (path) => location.pathname === path
   const firstName = (user?.name || 'there').split(' ')[0]
   const initial = (user?.name || 'U').trim().charAt(0).toUpperCase()
+
+  // Daily Login Bonus — fires once per calendar day the first time a
+  // signed-in user lands in the app shell (any page). claimDailyLoginBonus()
+  // is itself idempotent for the day, so this is safe even though AppShell
+  // mounts on every logged-in page. Reuses the same "gamification:update"
+  // event XPToast already listens for, so no new UI component is needed.
+  useEffect(() => {
+    if (!user?.id) return
+    try {
+      const result = claimDailyLoginBonus()
+      if (result.claimed) {
+        window.dispatchEvent(new CustomEvent('gamification:update', { detail: result }))
+      }
+    } catch {
+      // Gamification is a nice-to-have — never break the app shell over it.
+    }
+  }, [user?.id])
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -130,6 +162,24 @@ export default function AppShell({ children }) {
 
           {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2 mt-4">AI TOOLS</div>}
           {aiItems.map((item) => {
+            const Icon = item.icon
+            const active = isActive(item.path)
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-sm font-medium transition-colors ${
+                  active ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <Icon size={18} className="shrink-0" />
+                {sidebarOpen && <span className="truncate">{item.name}</span>}
+              </Link>
+            )
+          })}
+
+          {sidebarOpen && <div className="px-2 text-[11px] font-semibold tracking-wide text-gray-400 mb-2 mt-4">UK TOOLS</div>}
+          {ukToolsItems.map((item) => {
             const Icon = item.icon
             const active = isActive(item.path)
             return (

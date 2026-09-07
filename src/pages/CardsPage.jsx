@@ -1,15 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Seo from '../components/Seo'
 import { Link } from 'react-router-dom'
 import { FaCheck, FaArrowRight, FaSearch } from 'react-icons/fa'
 import { occupationalCards, occupationalCategories } from '../data/occupationalCards'
+import { apiRequest } from '../lib/api'
+import { useAuth } from '../context/AuthContext'
+import PageDisabledLock from '../components/PageDisabledLock'
+import PageLoader from '../components/PageLoader'
 
 function CardsPage() {
+  const { isAdmin } = useAuth()
   const [showFinder, setShowFinder] = useState(false)
   const [finderStep, setFinderStep] = useState(0)
   const [selectedRole, setSelectedRole] = useState(null)
   const [occSearch, setOccSearch] = useState('')
   const [occCategory, setOccCategory] = useState('all')
+
+  // Admins can flip this page on/off for regular users from Admin > Settings.
+  // Admins themselves always see the real page regardless of the toggle.
+  const [pageEnabled, setPageEnabled] = useState(true)
+  const [checkingAccess, setCheckingAccess] = useState(true)
+
+  useEffect(() => {
+    apiRequest('/api/settings/public', { auth: false })
+      .then((data) => setPageEnabled(data.ecsCardsPageEnabled !== false))
+      .catch(() => setPageEnabled(true)) // fail open if the settings check itself fails
+      .finally(() => setCheckingAccess(false))
+  }, [])
 
   // Complete 13 cards data. `path` links each card to whichever mock test
   // actually covers its HS&E exam category — several card types (Trainee,
@@ -45,7 +62,7 @@ function CardsPage() {
     { q: "Which ECS card do I need?", a: "It depends on your role and your highest qualification. Labourers with a Level 1 award need the Green Card; tradespeople with an NVQ Level 2 need the Blue Card; supervisors with an NVQ Level 3 need the Gold Card; managers with an NVQ Level 4-7 need the Black Card; degree-qualified and chartered professionals need a White Card." },
     { q: "How long is each ECS card valid?", a: "It varies by card. The first-time Green Labourer Card lasts 2 years (then 5 years on renewal since 1 February 2025); Blue, Gold, Black and White cards last 5 years; the Trainee, Experienced Technical/Supervisor/Manager and Industry Placement Cards last 3 years; the Experienced Worker Card lasts 1 year; and the Provisional Card lasts 6 months." },
     { q: "Which ECS cards cannot be renewed?", a: "The red cards, Trainee, Apprentice, Experienced Worker, Experienced Technical/Supervisor/Manager, Industry Placement and Provisional, are temporary and cannot be renewed. They are stepping-stone cards." },
-    { q: "Do all ECS cards require the ECS test?", a: "Most do. The ECS Health, Safety and Environment test is required for the great majority of routes. Confirm the exact requirement for your route at ecs.uk.com." },
+    { q: "Do all ECS cards require the ECS test?", a: "Most do. The ECS Health, Safety and Environment test is required for the great majority of routes. Confirm the exact requirement for your route at ecscard.org.uk." },
     { q: "How much does a ECS card cost?", a: "The ECS card fee is £57, the same across the colours, with the Apprentice card issued free of charge. Where a ECS test is required, a separate booking fee applies on top. Our mock tests are free." },
     { q: "How do I move up from one ECS card to the next?", a: "Complete the qualification for the next tier, pass the relevant ECS test, and apply for the new card. The typical career path runs Trainee → Labourer → Skilled Worker → Supervisor → Manager." },
   ]
@@ -82,8 +99,26 @@ function CardsPage() {
     }
   }
 
+  if (checkingAccess) {
+    return <PageLoader />
+  }
+
+  if (!pageEnabled && !isAdmin) {
+    return (
+      <PageDisabledLock
+        title="Types of ECS Cards"
+        message="This page has been temporarily disabled by the site admin. Please check back later."
+      />
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {!pageEnabled && isAdmin && (
+        <div className="bg-amber-100 border-b border-amber-300 text-amber-800 text-sm text-center py-2 px-4">
+          🔒 This page is currently hidden from regular users. You can see it because you're an admin. Turn it back on in Admin → Settings.
+        </div>
+      )}
       <Seo title="Types of ECS Cards Explained 2026 | Which Card Do You Need?" description="A complete guide to every ECS card type — Green, Black, Gold, Skilled Worker, Supervisor, Manager — and which one you need for your role." path="/types-of-ecs-cards" />
       
       {/* Hero Section */}
@@ -102,7 +137,7 @@ function CardsPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1">✓ Free ECS mock test</span>
-            <span className="flex items-center gap-1">✓ All 11 ECS topics</span>
+            <span className="flex items-center gap-1">✓ All 11 HSE topics</span>
             <span className="flex items-center gap-1">✓ AI explanations on every question</span>
           </div>
         </div>
@@ -367,10 +402,10 @@ function CardsPage() {
       <section className="py-6 bg-white">
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-gray-400">
-            ECSMockTest.uk is not affiliated with ECS or any official scheme. 
+            ECSPrep is not affiliated with ECS or any official scheme. 
             The card visuals on this page are original illustrations, not official cards, 
             and the information is provided for general guidance only, always confirm your route 
-            and the current rules at ecs.uk.com before applying.
+            and the current rules at ecscard.org.uk before applying.
           </p>
         </div>
       </section>

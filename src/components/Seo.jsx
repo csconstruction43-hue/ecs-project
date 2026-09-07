@@ -48,11 +48,16 @@ function Seo({ title, description, path = '/', image, keywords, jsonLd = [], noi
     const fullTitle = title ? `${title}` : SITE_NAME
     const url = `${SITE_URL}${path}`
     const ogImage = image ? (image.startsWith('http') ? image : `${SITE_URL}${image}`) : `${SITE_URL}/og-default.jpg`
+    // Admin > SEO Manager can force noindex sitewide (e.g. a staging copy),
+    // set on window by SiteThemeLoader once /api/settings/public resolves.
+    // Falls back to this page's own `noindex` prop on first render before
+    // that fetch completes, or if the setting was never turned on.
+    const sitewideNoIndex = typeof window !== 'undefined' && window.__SITE_SEO__?.robotsDisabled
 
     document.title = fullTitle
     upsertMeta('name', 'description', description)
     upsertMeta('name', 'keywords', Array.isArray(keywords) ? keywords.join(', ') : keywords)
-    upsertMeta('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow')
+    upsertMeta('name', 'robots', (noindex || sitewideNoIndex) ? 'noindex, nofollow' : 'index, follow')
     upsertLink('canonical', url)
 
     // Open Graph (Facebook, LinkedIn, WhatsApp previews, and used by many
@@ -92,6 +97,7 @@ function Seo({ title, description, path = '/', image, keywords, jsonLd = [], noi
 
 // ---------- Reusable JSON-LD builders ----------
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function articleSchema({ headline, description, datePublished, dateModified, author, path, image }) {
   return {
     '@context': 'https://schema.org',
@@ -111,6 +117,7 @@ export function articleSchema({ headline, description, datePublished, dateModifi
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function faqSchema(faqs) {
   return {
     '@context': 'https://schema.org',
@@ -123,6 +130,7 @@ export function faqSchema(faqs) {
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function breadcrumbSchema(items) {
   // items: [{ name: 'Home', path: '/' }, { name: 'Mock Tests', path: '/mock-test' }]
   return {
@@ -137,6 +145,7 @@ export function breadcrumbSchema(items) {
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function quizSchema({ name, description, numberOfQuestions, timeRequired }) {
   return {
     '@context': 'https://schema.org',
@@ -151,6 +160,7 @@ export function quizSchema({ name, description, numberOfQuestions, timeRequired 
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function organizationSchema() {
   return {
     '@context': 'https://schema.org',
@@ -171,6 +181,7 @@ export function organizationSchema() {
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function websiteSchema() {
   return {
     '@context': 'https://schema.org',

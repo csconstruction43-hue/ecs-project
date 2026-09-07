@@ -56,7 +56,7 @@ const CoursesPage = () => {
       {/* Filters */}
       <section className="bg-white border-b sticky top-[64px] xl:top-[113px] z-30">
         <div className="container mx-auto px-4 max-w-6xl py-4 flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50">
+          <div className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:border-primary transition-colors">
             <Search size={16} className="text-gray-400 shrink-0" />
             <input
               value={query}

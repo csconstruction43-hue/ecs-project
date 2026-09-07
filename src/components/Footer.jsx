@@ -16,6 +16,8 @@ const Footer = () => {
     { to: '/community', label: 'Community', icon: MessageSquare },
     { to: '/cards', label: 'ECS Cards', icon: CreditCard },
     { to: '/ecs-card-info', label: 'ECS Card & Test Guidance', icon: Shield },
+    { to: '/which-ecs-card', label: 'Which ECS Card Do I Need?', icon: Award },
+    { to: '/exam-day-checklist', label: 'Exam Day Checklist', icon: ClipboardCheck },
     { to: '/leaderboard', label: 'Leaderboard', icon: Trophy },
     { to: '/blog', label: 'Blog', icon: FileText },
     { to: '/pricing', label: 'Pricing', icon: Award },
@@ -34,6 +36,7 @@ const Footer = () => {
     { to: '/cookies', label: 'Cookie Policy' },
     { to: '/affiliate', label: 'Affiliates' },
     { to: '/about', label: 'About Us' },
+    { to: '/contact', label: 'Contact Us' },
   ]
 
   const socialLinks = [
@@ -169,7 +172,7 @@ const Footer = () => {
                 { icon: Bot, label: 'AI Study Assistant', desc: 'Chat with AI tutor 24/7' },
                 { icon: ClipboardCheck, label: 'Smart Mock Tests', desc: '50 questions · exam timing' },
                 { icon: BarChart2Icon, label: 'Progress Analytics', desc: 'Track weak areas' },
-                { icon: Shield, label: 'Pass Guarantee', desc: '96% of Pro users pass' },
+                { icon: Shield, label: 'Money-Back Guarantee', desc: '7-day full refund, no questions asked' },
               ].map((f, i) => (
                 <div key={i} className="flex items-start gap-2.5">
                   <div className="w-7 h-7 bg-blue-600/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">

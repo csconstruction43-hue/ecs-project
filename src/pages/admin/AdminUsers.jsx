@@ -1,7 +1,7 @@
 // pages/admin/AdminUsers.jsx
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Loader2, RefreshCcw, Download, Eye } from 'lucide-react'
+import { Search, Loader2, RefreshCcw, Download, Eye, ShieldOff, ShieldCheck } from 'lucide-react'
 import { apiRequest, apiRequestBlob } from '../../lib/api'
 
 const AUTO_REFRESH_MS = 10_000
@@ -85,17 +85,81 @@ const AdminUsers = () => {
     return u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)
   })
 
+  // New feature: bulk user actions — select several rows and
+  // suspend/reinstate them all in one request instead of one at a time.
+  const [selectedIds, setSelectedIds] = useState([])
+  const [bulkWorking, setBulkWorking] = useState(false)
+  const selectableIds = filtered.filter((u) => u.role !== 'admin').map((u) => u.id)
+  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectedIds.includes(id))
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+  const toggleSelectAll = () => {
+    setSelectedIds(allSelected ? [] : selectableIds)
+  }
+
+  const bulkSuspend = async (suspended) => {
+    if (selectedIds.length === 0) return
+    if (suspended && !window.confirm(`Suspend ${selectedIds.length} selected account(s)?`)) return
+    setBulkWorking(true)
+    setError('')
+    try {
+      await apiRequest('/api/admin/users/bulk-suspend', { method: 'POST', body: { userIds: selectedIds, suspended } })
+      setUsers((prev) => prev.map((u) => (selectedIds.includes(u.id) ? { ...u, suspended } : u)))
+      setSelectedIds([])
+    } catch (err) {
+      setError(err.message || 'Could not update the selected accounts.')
+    } finally {
+      setBulkWorking(false)
+    }
+  }
+
+  const [exportingAll, setExportingAll] = useState(false)
+  // Bulk export of every user as a CSV (name/email/plan/created/last-active)
+  // for spreadsheets or bulk emailing outside the app — separate from the
+  // single-user JSON export button in each row.
+  const exportAllUsers = async () => {
+    setExportingAll(true)
+    setError('')
+    try {
+      const blob = await apiRequestBlob('/api/admin/users/export.csv')
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `all-users-${new Date().toISOString().slice(0, 10)}.csv`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setError(err.message || 'Could not export users.')
+    } finally {
+      setExportingAll(false)
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Users Management</h1>
-        <button
-          onClick={loadUsers}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600"
-        >
-          <RefreshCcw size={18} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportAllUsers}
+            disabled={exportingAll}
+            className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-50 disabled:opacity-60"
+          >
+            {exportingAll ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+            Export CSV
+          </button>
+          <button
+            onClick={loadUsers}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600"
+          >
+            <RefreshCcw size={18} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -111,6 +175,30 @@ const AdminUsers = () => {
           />
         </div>
       </div>
+
+      {/* New feature: bulk action bar — appears once at least one row is selected */}
+      {selectedIds.length > 0 && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
+          <span className="text-sm text-indigo-800 font-medium">{selectedIds.length} selected</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => bulkSuspend(true)}
+              disabled={bulkWorking}
+              className="flex items-center gap-1.5 bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+            >
+              {bulkWorking ? <Loader2 size={14} className="animate-spin" /> : <ShieldOff size={14} />} Suspend
+            </button>
+            <button
+              onClick={() => bulkSuspend(false)}
+              disabled={bulkWorking}
+              className="flex items-center gap-1.5 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+            >
+              {bulkWorking ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />} Reinstate
+            </button>
+            <button onClick={() => setSelectedIds([])} className="text-indigo-700 text-sm hover:underline">Clear</button>
+          </div>
+        </div>
+      )}
 
       {loading && (
         <div className="flex items-center justify-center gap-2 text-gray-500 py-12">
@@ -129,6 +217,9 @@ const AdminUsers = () => {
           <table className="w-full min-w-[640px]">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-4 py-3 text-left">
+                  <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="rounded" />
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Signed up via</th>
@@ -142,13 +233,22 @@ const AdminUsers = () => {
             <tbody className="divide-y divide-gray-200">
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-gray-400">
+                  <td colSpan={9} className="px-6 py-8 text-center text-gray-400">
                     No users yet — they'll show up here as soon as someone signs up.
                   </td>
                 </tr>
               )}
               {filtered.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(user.id)}
+                      onChange={() => toggleSelect(user.id)}
+                      disabled={user.role === 'admin'}
+                      className="rounded"
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="font-medium">{user.name}</div>
                   </td>
@@ -156,10 +256,16 @@ const AdminUsers = () => {
                   <td className="px-6 py-4 whitespace-nowrap capitalize">{user.provider || 'password'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs rounded-full capitalize ${
-                      user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                      user.role === 'admin' ? 'bg-purple-100 text-purple-800'
+                      : user.role === 'support_agent' ? 'bg-sky-100 text-sky-800'
+                      : user.role === 'content_editor' ? 'bg-teal-100 text-teal-800'
+                      : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {user.role}
+                      {user.role?.replace('_', ' ')}
                     </span>
+                    {user.suspended && (
+                      <span className="ml-1 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-medium">Suspended</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">

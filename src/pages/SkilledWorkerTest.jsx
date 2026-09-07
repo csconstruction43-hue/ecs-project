@@ -47,6 +47,15 @@ function SkilledWorkerTest() {
     { text: "What is the correct procedure for manual handling?", options: ["Bend your back", "Keep the load away from your body", "Assess the load, bend knees, keep back straight", "Lift quickly"], correct: "Assess the load, bend knees, keep back straight", explanation: "Proper manual handling technique reduces the risk of back injury.", topic: "manual-handling" }
   ]
 
+  const resetTest = () => {
+    setCurrentIndex(0)
+    setScore(0)
+    setShowResult(false)
+    setSelectedAnswer(null)
+    setTestCompleted(false)
+    setAnsweredHistory([])
+  }
+
   // Filter questions based on topic and premium status
   useEffect(() => {
     let filtered = [...fullQuestionBank]
@@ -61,6 +70,7 @@ function SkilledWorkerTest() {
     setQuestions(filtered)
     setLoading(false)
     resetTest()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fullQuestionBank is a stable module-level const
   }, [isPremium, topicFilter])
 
   const currentQ = questions[currentIndex]
@@ -89,14 +99,6 @@ function SkilledWorkerTest() {
     }
   }
 
-  const resetTest = () => {
-    setCurrentIndex(0)
-    setScore(0)
-    setShowResult(false)
-    setSelectedAnswer(null)
-    setTestCompleted(false)
-    setAnsweredHistory([])
-  }
 
   const upgradeToPremium = () => {
     setIsPremium(true)
@@ -118,7 +120,7 @@ function SkilledWorkerTest() {
   }
 
   if (!canAccessTest('/ecs-skilled-worker-test', isPro)) {
-    return <LockedTestScreen testName="ECS Skilled Worker Test" />
+    return <LockedTestScreen testName="ECS Skilled Worker Test" previewQuestions={fullQuestionBank.slice(0, 3)} testStats={{ totalQuestions: fullQuestionBank.length, passMark: 0.86, duration: 1800 }} />
   }
 
   if (testCompleted) {
@@ -276,7 +278,7 @@ function SkilledWorkerTest() {
             <div className="text-sm text-blue-600">{isPremium ? '50+ questions' : '10 free questions'}</div>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
-            <div className="font-bold text-green-800">All 11 ECS topics</div>
+            <div className="font-bold text-green-800">All 11 HSE topics</div>
             <div className="text-sm text-green-600">{isPremium ? 'Full coverage' : 'Limited preview'}</div>
           </div>
           <div className="bg-purple-50 p-4 rounded-lg">
@@ -370,7 +372,7 @@ function SkilledWorkerTest() {
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-5 border-2 border-purple-200">
             <div className="text-2xl mb-2">🚀</div>
             <h3 className="font-bold text-lg">Unlock Full Access</h3>
-            <p className="text-sm text-gray-600 mb-3">50+ real exam questions, 11 ECS topics, AI explanations</p>
+            <p className="text-sm text-gray-600 mb-3">50+ practice questions, 11 HSE topics, AI explanations</p>
             <button onClick={upgradeToPremium} className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
               Upgrade to Premium
             </button>

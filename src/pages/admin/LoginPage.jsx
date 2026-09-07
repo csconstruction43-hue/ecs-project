@@ -1,14 +1,14 @@
 // pages/LoginPage.jsx
 import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import GoogleSignInButton from '../../components/GoogleSignInButton'
 
 const LoginPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login } = useAuth()
+  const { login, verifyTwoFactorLogin, resendTwoFactorCode } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -17,6 +17,50 @@ const LoginPage = () => {
     rememberMe: false
   })
   const [errors, setErrors] = useState({})
+
+  // New feature: Two-Factor Authentication. When the account has 2FA
+  // turned on, login() below returns a pendingToken instead of a session —
+  // this holds that token while the person enters the emailed code.
+  const [pendingToken, setPendingToken] = useState(null)
+  const [otpCode, setOtpCode] = useState('')
+  const [otpError, setOtpError] = useState('')
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [resent, setResent] = useState(false)
+
+  const goToDashboard = (loggedInUser) => {
+    const from = location.state?.from
+    if (from) navigate(from)
+    else navigate(loggedInUser.role === 'admin' ? '/admin/dashboard' : '/dashboard')
+  }
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault()
+    if (otpCode.trim().length !== 6) {
+      setOtpError('Enter the 6-digit code from your email.')
+      return
+    }
+    setOtpError('')
+    setOtpLoading(true)
+    try {
+      const loggedInUser = await verifyTwoFactorLogin({ pendingToken, code: otpCode.trim() })
+      goToDashboard(loggedInUser)
+    } catch (error) {
+      setOtpError(error.message || 'Incorrect or expired code.')
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const handleResendOtp = async () => {
+    setOtpError('')
+    try {
+      await resendTwoFactorCode(pendingToken)
+      setResent(true)
+      setTimeout(() => setResent(false), 4000)
+    } catch (error) {
+      setOtpError(error.message || 'Could not resend the code.')
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -55,21 +99,87 @@ const LoginPage = () => {
 
     setLoading(true)
     try {
-      const loggedInUser = await login({
+      const result = await login({
         email: formData.email,
         password: formData.password,
       })
-      const from = location.state?.from
-      if (from) {
-        navigate(from)
-      } else {
-        navigate(loggedInUser.role === 'admin' ? '/admin/dashboard' : '/dashboard')
+      // New feature: Two-Factor Authentication — show the "enter your code"
+      // step instead of navigating away.
+      if (result?.requires2FA) {
+        setPendingToken(result.pendingToken)
+        return
       }
+      goToDashboard(result)
     } catch (error) {
       setErrors({ general: error.message || 'Invalid email or password' })
     } finally {
       setLoading(false)
     }
+  }
+
+  // New feature: Two-Factor Authentication — the OTP-entry step, shown
+  // instead of the password form once login() reports requires2FA.
+  if (pendingToken) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+          <div className="text-center mb-8">
+            <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center">
+              <ShieldCheck className="text-teal-600" size={24} />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800">Check your email</h1>
+            <p className="text-gray-600 mt-2 text-sm">
+              We've sent a 6-digit code to <span className="font-medium">{formData.email}</span>.
+              Enter it below to finish signing in.
+            </p>
+          </div>
+
+          {otpError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
+              {otpError}
+            </div>
+          )}
+          {resent && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
+              A new code has been sent.
+            </div>
+          )}
+
+          <form onSubmit={handleVerifyOtp} className="space-y-5">
+            <input
+              type="text"
+              inputMode="numeric"
+              autoFocus
+              maxLength={6}
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+              placeholder="000000"
+              className="w-full text-center tracking-[0.5em] text-2xl font-semibold py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit"
+              disabled={otpLoading}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {otpLoading ? 'Verifying…' : 'Verify & Sign In'}
+            </button>
+          </form>
+
+          <div className="flex items-center justify-between mt-5 text-sm">
+            <button type="button" onClick={handleResendOtp} className="text-blue-600 hover:text-blue-800 font-medium">
+              Resend code
+            </button>
+            <button
+              type="button"
+              onClick={() => { setPendingToken(null); setOtpCode(''); setOtpError('') }}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ← Back to sign in
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

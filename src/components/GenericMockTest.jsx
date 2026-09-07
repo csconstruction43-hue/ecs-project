@@ -9,6 +9,7 @@ import { FaClock, FaCheckCircle, FaTimesCircle, FaLightbulb, FaArrowRight, FaRed
 import Seo from './Seo'
 import AIExplainButton from './AIExplainButton'
 import QuestionAudio from './QuestionAudio'
+import ReportQuestionButton from './ReportQuestionButton'
 import LockedTestScreen from './LockedTestScreen'
 import { useAuth } from '../context/AuthContext'
 import { canAccessTest } from '../lib/testAccess'
@@ -30,6 +31,9 @@ function GenericMockTest() {
   const questions = useMemo(() => {
     if (!config) return []
     return typeof config.getQuestions === 'function' ? config.getQuestions() : (config.questions || [])
+    // location.pathname and restartKey aren't read above, but they intentionally
+    // force a fresh randomised draw on route change and on "Try Again".
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, config, restartKey])
 
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -76,7 +80,7 @@ function GenericMockTest() {
   }
 
   if (!canAccessTest(location.pathname, isPro)) {
-    return <LockedTestScreen testName={config.title} />
+    return <LockedTestScreen testName={config.title} testPath={location.pathname} />
   }
 
   const currentQ = questions[currentIndex]
@@ -403,6 +407,15 @@ function GenericMockTest() {
             <h2 className="text-xl md:text-2xl font-semibold mb-4 leading-relaxed">{currentQ.text}</h2>
 
             <QuestionAudio text={currentQ.text} isPro={isPro} />
+
+            <div className="flex justify-end mb-2">
+              <ReportQuestionButton
+                questionId={currentQ.id}
+                questionText={currentQ.text}
+                options={currentQ.options}
+                testLabel={config.title}
+              />
+            </div>
 
             <div className="space-y-3">
               {currentQ.options.map((option, idx) => {

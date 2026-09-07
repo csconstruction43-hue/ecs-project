@@ -13,7 +13,8 @@
 //     "+120 XP" / "Badge unlocked" without every test page needing to know
 //     about gamification directly.
 import { apiRequest } from './api'
-import { processTestCompletion } from './gamification'
+import { processTestCompletion, computeCombo } from './gamification'
+import { enqueueRequest } from './offlineQueue'
 
 const WRONG_BANK_KEY = 'wrongQuestionsBank'
 const MAX_WRONG_BANK = 500
@@ -100,19 +101,28 @@ export function recordTestResult({ testType, testLabel, score, total, answers })
     updateWrongBank(answers, testLabel)
   }
 
-  // Gamification: XP, streak, badges. Never blocks the results screen.
+  // Gamification: XP, streak, badges, combo bonus, daily challenge & goal
+  // progress. Never blocks the results screen.
   try {
-    const result = processTestCompletion({ score, total })
+    const combo = Array.isArray(answers) && answers.length > 0 ? computeCombo(answers) : null
+    const result = processTestCompletion({ score, total, combo })
     window.dispatchEvent(new CustomEvent('gamification:update', { detail: result }))
   } catch {
     // ignore — gamification is a nice-to-have, never break test results
   }
 
-  apiRequest('/api/leaderboard/submit', {
-    method: 'POST',
-    body: { testType, score, total },
-  }).catch(() => {
-    // Not logged in yet, or offline — the local history above still works.
+  // New: offline resilience. If this fails because the device has no
+  // signal (rather than simply not being logged in), queue it so the
+  // leaderboard/streak still gets the result once connectivity returns —
+  // previously an offline submission here was just silently lost.
+  const leaderboardRequest = { path: '/api/leaderboard/submit', options: { method: 'POST', body: { testType, score, total } } }
+  apiRequest(leaderboardRequest.path, leaderboardRequest.options).catch(() => {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      enqueueRequest(leaderboardRequest.path, leaderboardRequest.options)
+    }
+    // Otherwise: not logged in, or a real server error — the local
+    // history above still works, and retrying a non-network failure
+    // forever wouldn't help.
   })
 
   return { percentage }
@@ -129,4 +139,49 @@ export function removeFromWrongBank(question) {
 
 export function clearWrongBank() {
   saveWrongBank([])
+}
+
+// Weekly Recap — compares this calendar week (Mon-Sun) against last week
+// using the same "testHistory" data the Dashboard/Analytics pages already
+// read, so no extra storage is needed.
+function startOfWeek(d) {
+  const date = new Date(d)
+  const day = date.getDay() // 0 = Sun
+  const diff = (day === 0 ? -6 : 1) - day // shift to Monday
+  date.setDate(date.getDate() + diff)
+  date.setHours(0, 0, 0, 0)
+  return date
+}
+
+function summarize(entries) {
+  const tests = entries.length
+  const avg = tests > 0 ? Math.round(entries.reduce((sum, e) => sum + (e.percentage || 0), 0) / tests) : 0
+  return { tests, avg }
+}
+
+export function getWeeklyRecap() {
+  let history = []
+  try {
+    history = JSON.parse(localStorage.getItem('testHistory') || '[]')
+  } catch {
+    history = []
+  }
+
+  const now = new Date()
+  const thisWeekStart = startOfWeek(now)
+  const lastWeekStart = new Date(thisWeekStart)
+  lastWeekStart.setDate(lastWeekStart.getDate() - 7)
+
+  const thisWeekEntries = history.filter((e) => new Date(e.date) >= thisWeekStart)
+  const lastWeekEntries = history.filter((e) => new Date(e.date) >= lastWeekStart && new Date(e.date) < thisWeekStart)
+
+  const thisWeek = summarize(thisWeekEntries)
+  const lastWeek = summarize(lastWeekEntries)
+
+  return {
+    thisWeek,
+    lastWeek,
+    testsDelta: thisWeek.tests - lastWeek.tests,
+    avgDelta: thisWeek.tests > 0 && lastWeek.tests > 0 ? thisWeek.avg - lastWeek.avg : null,
+  }
 }

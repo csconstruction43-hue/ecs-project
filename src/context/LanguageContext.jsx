@@ -4,6 +4,7 @@
 // share the same /api/translate* endpoints and cache.
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const LANGUAGES = [
   { code: 'en', name: 'English' },
   { code: 'cy', name: 'Welsh' },
@@ -55,6 +56,7 @@ export function LanguageProvider({ children }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLanguage() {
   const ctx = useContext(LanguageContext)
   if (!ctx) throw new Error('useLanguage must be used within a LanguageProvider')

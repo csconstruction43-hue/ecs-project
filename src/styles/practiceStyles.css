@@ -1,0 +1,84 @@
+/* styles/practiceStyles.css
+ *
+ * Consumed by PracticeStyleProvider's wrapper div, which sets the
+ * --ps-* custom properties from src/lib/practiceStyles.js inline based
+ * on the learner's chosen style. Defaults below match "Classic Clean"
+ * so anything using these classes outside a themed wrapper still looks
+ * right.
+ */
+
+.ps-root {
+  font-family: var(--ps-font, 'Inter', ui-sans-serif, system-ui, sans-serif);
+  color: var(--ps-text, #1f2937);
+  background: linear-gradient(to bottom, var(--ps-page-from, #f9fafb), var(--ps-page-to, #f3f4f6));
+  transition: background 0.2s ease;
+}
+
+.ps-card {
+  background: var(--ps-card-bg, #ffffff);
+  border: 1px solid var(--ps-card-border, #e5e7eb);
+  box-shadow: var(--ps-card-shadow, 0 20px 25px -5px rgb(0 0 0 / 0.08));
+  border-radius: var(--ps-radius, 1rem);
+  color: var(--ps-text, #1f2937);
+}
+
+.ps-muted {
+  color: var(--ps-muted, #6b7280);
+}
+
+.ps-badge {
+  background: var(--ps-badge-bg, #dcfce7);
+  color: var(--ps-badge-text, #15803d);
+}
+
+.ps-accent-text {
+  color: var(--ps-accent-strong, #15803d);
+}
+
+.ps-cta {
+  background: linear-gradient(to right, var(--ps-accent, #16a34a), var(--ps-accent-strong, #15803d));
+  color: var(--ps-accent-contrast, #ffffff);
+}
+
+.ps-progress-track {
+  background: var(--ps-option-border, #e5e7eb);
+}
+
+.ps-progress-fill {
+  background: linear-gradient(to right, var(--ps-progress-from, #22c55e), var(--ps-progress-to, #16a34a));
+}
+
+.ps-option {
+  background: var(--ps-option-bg, #ffffff);
+  border: 2px solid var(--ps-option-border, #e5e7eb);
+  color: var(--ps-text, #1f2937);
+}
+
+.ps-option:not(:disabled):hover {
+  border-color: var(--ps-option-hover-border, #16a34a);
+  background: var(--ps-option-hover-bg, #f0fdf4);
+}
+
+.ps-option-letter {
+  background: var(--ps-badge-bg, #dcfce7);
+  color: var(--ps-badge-text, #15803d);
+}
+
+.ps-option-correct {
+  background: var(--ps-correct-bg, #f0fdf4) !important;
+  border-color: var(--ps-correct-border, #22c55e) !important;
+}
+
+.ps-option-correct .ps-option-letter {
+  background: var(--ps-correct-border, #22c55e);
+  color: #ffffff;
+}
+
+.ps-option-incorrect {
+  background: var(--ps-incorrect-bg, #fef2f2) !important;
+  border-color: var(--ps-incorrect-border, #ef4444) !important;
+}
+
+.ps-option-faded {
+  opacity: 0.6;
+}

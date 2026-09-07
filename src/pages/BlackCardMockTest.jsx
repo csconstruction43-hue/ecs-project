@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { recordTestResult } from '../lib/testResults'
 import Seo from '../components/Seo'
 import { Link, useNavigate } from 'react-router-dom'
@@ -33,7 +33,7 @@ function BlackCardMockTest() {
   const [streak, setStreak] = useState(0)
   const [bestStreak, setBestStreak] = useState(0)
   const [timeSpentPerQuestion, setTimeSpentPerQuestion] = useState([])
-  const [questionStartTime, setQuestionStartTime] = useState(Date.now())
+  const [questionStartTime, setQuestionStartTime] = useState(() => Date.now())
   const [xRayMode, setXRayMode] = useState(false)
 
   // Full question bank - Extended to 100+ questions
@@ -191,7 +191,10 @@ function BlackCardMockTest() {
     return extendedBank
   }
 
-  const completeQuestionBank = generateFullQuestionBank()
+  // Built once and reused — this used to be rebuilt (looping to build a
+  // 100-question array) on every single render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fullQuestionBank is a fixed local literal, not a changing value
+  const completeQuestionBank = useMemo(() => generateFullQuestionBank(), [])
 
   const topics = [
     { id: 'all', name: 'All Topics', icon: '📚', count: 100 },
@@ -235,7 +238,7 @@ function BlackCardMockTest() {
     setAnswersHistory([])
     setStreak(0)
     setQuestionStartTime(Date.now())
-  }, [isPremium, topicFilter, difficulty, showBookmarksOnly, bookmarkedQuestions, practiceMode])
+  }, [isPremium, topicFilter, difficulty, showBookmarksOnly, bookmarkedQuestions, practiceMode, completeQuestionBank])
 
   const currentQ = questions[currentIndex]
 
@@ -348,7 +351,7 @@ function BlackCardMockTest() {
   }, [testCompleted])
 
   if (!canAccessTest('/ecs-black-card-mock-test', isPro)) {
-    return <LockedTestScreen testName="ECS Black Card Mock Test" />
+    return <LockedTestScreen testName="ECS Black Card Mock Test" previewQuestions={fullQuestionBank.slice(0, 3)} testStats={{ totalQuestions: fullQuestionBank.length, passMark: 0.8, duration: 1800 }} />
   }
 
   if (questions.length === 0) {
@@ -688,7 +691,7 @@ function BlackCardMockTest() {
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
                 <span className="text-green-500 text-xl">✓</span>
-                <div><div className="font-semibold">100+ Real Exam Questions</div><div className="text-sm text-gray-500">Full question bank with manager-level content</div></div>
+                <div><div className="font-semibold">100+ Practice Questions</div><div className="text-sm text-gray-500">Full question bank with manager-level content</div></div>
               </div>
               <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
                 <span className="text-green-500 text-xl">✓</span>

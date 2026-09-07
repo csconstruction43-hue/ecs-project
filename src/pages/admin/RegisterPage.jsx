@@ -1,9 +1,12 @@
 // pages/RegisterPage.jsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import GoogleSignInButton from '../../components/GoogleSignInButton'
+import { apiRequest } from '../../lib/api'
+import PageDisabledLock from '../../components/PageDisabledLock'
+import PageLoader from '../../components/PageLoader'
 
 const RegisterPage = () => {
   const navigate = useNavigate()
@@ -19,6 +22,20 @@ const RegisterPage = () => {
     agreeTerms: false
   })
   const [errors, setErrors] = useState({})
+
+  // An admin can close new signups from Admin > Settings. Check that
+  // before showing the form so people don't fill it in only to be
+  // rejected by the backend at the end.
+  const [registrationEnabled, setRegistrationEnabled] = useState(true)
+  const [checkingAccess, setCheckingAccess] = useState(true)
+
+  useEffect(() => {
+    apiRequest('/api/settings/public', { auth: false })
+      .then((data) => setRegistrationEnabled(data.registrationEnabled !== false))
+      .catch(() => setRegistrationEnabled(true))
+      .finally(() => setCheckingAccess(false))
+  }, [])
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -86,6 +103,19 @@ const RegisterPage = () => {
     { label: 'Contains lowercase letter', met: /[a-z]/.test(formData.password) },
     { label: 'Contains a number', met: /\d/.test(formData.password) },
   ]
+
+  if (checkingAccess) {
+    return <PageLoader />
+  }
+
+  if (!registrationEnabled) {
+    return (
+      <PageDisabledLock
+        title="Registration is closed"
+        message="New account sign-ups are temporarily closed. If you already have an account, please log in instead."
+      />
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">

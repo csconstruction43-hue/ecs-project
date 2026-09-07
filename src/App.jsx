@@ -1,146 +1,185 @@
 // App.jsx
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import AdminLayout from './components/AdminLayout'
+import PageVisibilityGate from './components/PageVisibilityGate'
 import AppShell from './components/AppShell'
 
 // Public Pages
 import HomePage from './pages/HomePage'
-import AboutPage from './pages/AboutPage'
-import CoursesPage from './pages/CoursesPage'
-import CourseDetailPage from './pages/CourseDetailPage'
-import MyCoursesPage from './pages/MyCoursesPage'
-import MockTestsPage from './pages/MockTestsPage'
-import HseTopicPracticeHub from './pages/HseTopicPracticeHub'
-import TopicTestPage from './pages/TopicTestPage'
-import CardsPage from './pages/CardsPage'
-import PricingPage from './pages/PricingPage'
-import BlogPage from './pages/BlogPage'
-import BlogPostPage from './pages/BlogPostPage'
-import StudyGuidePage from './pages/StudyGuidePage'
-import ChapterDetailPage from './pages/ChapterDetailPage'
-import GuestTestPage from './pages/GuestTestPage'
-import PracticePage from './pages/PracticePage'
-import GreenCardMockTest from './pages/GreenCardMockTest'
-import SkilledWorkerTest from './pages/SkilledWorkerTest'
-import SupervisorTest from './pages/SupervisorTest'
-import BlackCardMockTest from './pages/BlackCardMockTest'
-import BookPage from './pages/BookPage'
-import ECSCardBookingPage from './pages/ECSCardBookingPage'
-import PricingPlansPage from './pages/PricingPlansPage'
-import LeaderboardPage from './pages/LeaderboardPage'
-import CertificatePage from './pages/CertificatePage'
-import TermsPage from './pages/TermsPage'
-import PrivacyPage from './pages/PrivacyPage'
-import NotFoundPage from './pages/NotFoundPage'
-import SafetySignsPage from './pages/SafetySignsPage'
-import StudyMaterialPage from './pages/StudyMaterialPage'
-import VideoLibraryPage from './pages/VideoLibraryPage'
-import CommunityPage from './pages/CommunityPage'
-import ECSCardInfoPage from './pages/ECSCardInfoPage'
-import LabourerPage from './pages/ecs-cards/LabourerPage'
-import ElectricalLabourerPage from './pages/ecs-cards/ElectricalLabourerPage'
-import ApprenticePage from './pages/ecs-cards/ApprenticePage'
-import TraineeElectricianPage from './pages/ecs-cards/TraineeElectricianPage'
-import IndustryPlacementTLevelPage from './pages/ecs-cards/IndustryPlacementTLevelPage'
-import ExperiencedWorkerGoldStripeTempPage from './pages/ecs-cards/ExperiencedWorkerGoldStripeTempPage'
-import SiteSupportOccupationsPage from './pages/ecs-cards/SiteSupportOccupationsPage'
-import ProvisionalInstallationElectricianPage from './pages/ecs-cards/ProvisionalInstallationElectricianPage'
-import InstallationElectricianGoldPage from './pages/ecs-cards/InstallationElectricianGoldPage'
-import ApprovedElectricianGoldPage from './pages/ecs-cards/ApprovedElectricianGoldPage'
-import RegisteredElectricianGoldPage from './pages/ecs-cards/RegisteredElectricianGoldPage'
-import TechnicianGoldPage from './pages/ecs-cards/TechnicianGoldPage'
-import MaintenanceElectricianPage from './pages/ecs-cards/MaintenanceElectricianPage'
-import ElectricalFitterPage from './pages/ecs-cards/ElectricalFitterPage'
-import EngineeringMaintenanceElectricianPage from './pages/ecs-cards/EngineeringMaintenanceElectricianPage'
-import WiremanAndPanelBuilderPage from './pages/ecs-cards/WiremanAndPanelBuilderPage'
-import MarineElectricianPage from './pages/ecs-cards/MarineElectricianPage'
-import AutoElectricianPage from './pages/ecs-cards/AutoElectricianPage'
-import ElectricalProductServiceEngineerPage from './pages/ecs-cards/ElectricalProductServiceEngineerPage'
-import ElectricalWinderPage from './pages/ecs-cards/ElectricalWinderPage'
-import DistributionNetworksElectricianPage from './pages/ecs-cards/DistributionNetworksElectricianPage'
-import InstrumentsMechanicPage from './pages/ecs-cards/InstrumentsMechanicPage'
-import FessApprenticePage from './pages/ecs-cards/FessApprenticePage'
-import FessLabourerPage from './pages/ecs-cards/FessLabourerPage'
-import FessSystemsOperativePage from './pages/ecs-cards/FessSystemsOperativePage'
-import FessSystemsTechnicianEngineerPage from './pages/ecs-cards/FessSystemsTechnicianEngineerPage'
-import BuildingControlsInstallerEngineerPage from './pages/ecs-cards/BuildingControlsInstallerEngineerPage'
-import NetworkInfrastructureAssistantPage from './pages/ecs-cards/NetworkInfrastructureAssistantPage'
-import NetworkInfrastructureInstallerPage from './pages/ecs-cards/NetworkInfrastructureInstallerPage'
-import LvJointerPage from './pages/ecs-cards/LvJointerPage'
-import TelecommunicationsFitterPage from './pages/ecs-cards/TelecommunicationsFitterPage'
-import CellularNetworkFieldEngineerPage from './pages/ecs-cards/CellularNetworkFieldEngineerPage'
-import SignalDistributionSpecialistPage from './pages/ecs-cards/SignalDistributionSpecialistPage'
-import TelecomsOperativePage from './pages/ecs-cards/TelecomsOperativePage'
-import AvOperativeAvTechnicianPage from './pages/ecs-cards/AvOperativeAvTechnicianPage'
-import BroadcastAndMediaSupervisorPage from './pages/ecs-cards/BroadcastAndMediaSupervisorPage'
-import CreativeProductionOperativePage from './pages/ecs-cards/CreativeProductionOperativePage'
-import CreativeProductionTechnicianPage from './pages/ecs-cards/CreativeProductionTechnicianPage'
-import CreativeProductionManagerPage from './pages/ecs-cards/CreativeProductionManagerPage'
-import IscveAvEngineerPage from './pages/ecs-cards/IscveAvEngineerPage'
-import IscveSoundEngineerPage from './pages/ecs-cards/IscveSoundEngineerPage'
-import AvixaCommercialAvIntegratorPage from './pages/ecs-cards/AvixaCommercialAvIntegratorPage'
-import RadioAndTelevisionElectricianPage from './pages/ecs-cards/RadioAndTelevisionElectricianPage'
-import SiteSupervisorPage from './pages/ecs-cards/SiteSupervisorPage'
-import SiteManagerPage from './pages/ecs-cards/SiteManagerPage'
-import ContractsManagerPage from './pages/ecs-cards/ContractsManagerPage'
-import ProjectManagerPage from './pages/ecs-cards/ProjectManagerPage'
-import AcademicallyQualifiedPersonAqpPage from './pages/ecs-cards/AcademicallyQualifiedPersonAqpPage'
-import ProfessionallyQualifiedPersonPqpPage from './pages/ecs-cards/ProfessionallyQualifiedPersonPqpPage'
-import VehicleInstallerPage from './pages/ecs-cards/VehicleInstallerPage'
-import GateSafeInstallerPage from './pages/ecs-cards/GateSafeInstallerPage'
-import SllLightingProfessionalPage from './pages/ecs-cards/SllLightingProfessionalPage'
-import CalculatorsPage from './pages/CalculatorsPage'
-import AM2SimulatorPage from './pages/AM2SimulatorPage'
+const AboutPage = lazy(() => import('./pages/AboutPage'))
+const ContactPage = lazy(() => import('./pages/ContactPage'))
+const CoursesPage = lazy(() => import('./pages/CoursesPage'))
+const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
+const MyCoursesPage = lazy(() => import('./pages/MyCoursesPage'))
+const MockTestsPage = lazy(() => import('./pages/MockTestsPage'))
+const HseTopicPracticeHub = lazy(() => import('./pages/HseTopicPracticeHub'))
+const TopicTestPage = lazy(() => import('./pages/TopicTestPage'))
+const CardsPage = lazy(() => import('./pages/CardsPage'))
+const PricingPage = lazy(() => import('./pages/PricingPage'))
+const BlogPage = lazy(() => import('./pages/BlogPage'))
+const BlogPostPage = lazy(() => import('./pages/BlogPostPage'))
+const DynamicPage = lazy(() => import('./pages/DynamicPage'))
+const StudyGuidePage = lazy(() => import('./pages/StudyGuidePage'))
+const ChapterDetailPage = lazy(() => import('./pages/ChapterDetailPage'))
+const GuestTestPage = lazy(() => import('./pages/GuestTestPage'))
+const PracticePage = lazy(() => import('./pages/PracticePage'))
+const GreenCardMockTest = lazy(() => import('./pages/GreenCardMockTest'))
+const SkilledWorkerTest = lazy(() => import('./pages/SkilledWorkerTest'))
+const SupervisorTest = lazy(() => import('./pages/SupervisorTest'))
+const BlackCardMockTest = lazy(() => import('./pages/BlackCardMockTest'))
+const ManagerTest = lazy(() => import('./pages/ManagerTest'))
+const BookPage = lazy(() => import('./pages/BookPage'))
+const ECSCardBookingPage = lazy(() => import('./pages/ECSCardBookingPage'))
+const CardApplicationTrackerPage = lazy(() => import('./pages/CardApplicationTrackerPage'))
+const SmartPracticePage = lazy(() => import('./pages/SmartPracticePage'))
+const ECSTestBookingPage = lazy(() => import('./pages/ECSTestBookingPage'))
+const TestCentreFinderPage = lazy(() => import('./pages/TestCentreFinderPage'))
+const CardRenewalReminderPage = lazy(() => import('./pages/CardRenewalReminderPage'))
+const PricingPlansPage = lazy(() => import('./pages/PricingPlansPage'))
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
+const CertificatePage = lazy(() => import('./pages/CertificatePage'))
+const TermsPage = lazy(() => import('./pages/TermsPage'))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
+const CookiesPage = lazy(() => import('./pages/CookiesPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+const SafetySignsPage = lazy(() => import('./pages/SafetySignsPage'))
+const StudyMaterialPage = lazy(() => import('./pages/StudyMaterialPage'))
+const VideoLibraryPage = lazy(() => import('./pages/VideoLibraryPage'))
+const CommunityPage = lazy(() => import('./pages/CommunityPage'))
+const ECSCardInfoPage = lazy(() => import('./pages/ECSCardInfoPage'))
+const CardEligibilityWizardPage = lazy(() => import('./pages/CardEligibilityWizardPage'))
+const ExamDayChecklistPage = lazy(() => import('./pages/ExamDayChecklistPage'))
+const TeamDashboardPage = lazy(() => import('./pages/TeamDashboardPage'))
+const TeamAuditReportPage = lazy(() => import('./pages/TeamAuditReportPage'))
+const TeamInviteAcceptPage = lazy(() => import('./pages/TeamInviteAcceptPage'))
+const LabourerPage = lazy(() => import('./pages/ecs-cards/LabourerPage'))
+const ElectricalLabourerPage = lazy(() => import('./pages/ecs-cards/ElectricalLabourerPage'))
+const ApprenticePage = lazy(() => import('./pages/ecs-cards/ApprenticePage'))
+const TraineeElectricianPage = lazy(() => import('./pages/ecs-cards/TraineeElectricianPage'))
+const IndustryPlacementTLevelPage = lazy(() => import('./pages/ecs-cards/IndustryPlacementTLevelPage'))
+const ExperiencedWorkerGoldStripeTempPage = lazy(() => import('./pages/ecs-cards/ExperiencedWorkerGoldStripeTempPage'))
+const SiteSupportOccupationsPage = lazy(() => import('./pages/ecs-cards/SiteSupportOccupationsPage'))
+const ProvisionalInstallationElectricianPage = lazy(() => import('./pages/ecs-cards/ProvisionalInstallationElectricianPage'))
+const InstallationElectricianGoldPage = lazy(() => import('./pages/ecs-cards/InstallationElectricianGoldPage'))
+const ApprovedElectricianGoldPage = lazy(() => import('./pages/ecs-cards/ApprovedElectricianGoldPage'))
+const RegisteredElectricianGoldPage = lazy(() => import('./pages/ecs-cards/RegisteredElectricianGoldPage'))
+const TechnicianGoldPage = lazy(() => import('./pages/ecs-cards/TechnicianGoldPage'))
+const MaintenanceElectricianPage = lazy(() => import('./pages/ecs-cards/MaintenanceElectricianPage'))
+const ElectricalFitterPage = lazy(() => import('./pages/ecs-cards/ElectricalFitterPage'))
+const EngineeringMaintenanceElectricianPage = lazy(() => import('./pages/ecs-cards/EngineeringMaintenanceElectricianPage'))
+const WiremanAndPanelBuilderPage = lazy(() => import('./pages/ecs-cards/WiremanAndPanelBuilderPage'))
+const MarineElectricianPage = lazy(() => import('./pages/ecs-cards/MarineElectricianPage'))
+const AutoElectricianPage = lazy(() => import('./pages/ecs-cards/AutoElectricianPage'))
+const ElectricalProductServiceEngineerPage = lazy(() => import('./pages/ecs-cards/ElectricalProductServiceEngineerPage'))
+const ElectricalWinderPage = lazy(() => import('./pages/ecs-cards/ElectricalWinderPage'))
+const DistributionNetworksElectricianPage = lazy(() => import('./pages/ecs-cards/DistributionNetworksElectricianPage'))
+const InstrumentsMechanicPage = lazy(() => import('./pages/ecs-cards/InstrumentsMechanicPage'))
+const FessApprenticePage = lazy(() => import('./pages/ecs-cards/FessApprenticePage'))
+const FessLabourerPage = lazy(() => import('./pages/ecs-cards/FessLabourerPage'))
+const FessSystemsOperativePage = lazy(() => import('./pages/ecs-cards/FessSystemsOperativePage'))
+const FessSystemsTechnicianEngineerPage = lazy(() => import('./pages/ecs-cards/FessSystemsTechnicianEngineerPage'))
+const BuildingControlsInstallerEngineerPage = lazy(() => import('./pages/ecs-cards/BuildingControlsInstallerEngineerPage'))
+const NetworkInfrastructureAssistantPage = lazy(() => import('./pages/ecs-cards/NetworkInfrastructureAssistantPage'))
+const NetworkInfrastructureInstallerPage = lazy(() => import('./pages/ecs-cards/NetworkInfrastructureInstallerPage'))
+const LvJointerPage = lazy(() => import('./pages/ecs-cards/LvJointerPage'))
+const TelecommunicationsFitterPage = lazy(() => import('./pages/ecs-cards/TelecommunicationsFitterPage'))
+const CellularNetworkFieldEngineerPage = lazy(() => import('./pages/ecs-cards/CellularNetworkFieldEngineerPage'))
+const SignalDistributionSpecialistPage = lazy(() => import('./pages/ecs-cards/SignalDistributionSpecialistPage'))
+const TelecomsOperativePage = lazy(() => import('./pages/ecs-cards/TelecomsOperativePage'))
+const AvOperativeAvTechnicianPage = lazy(() => import('./pages/ecs-cards/AvOperativeAvTechnicianPage'))
+const BroadcastAndMediaSupervisorPage = lazy(() => import('./pages/ecs-cards/BroadcastAndMediaSupervisorPage'))
+const CreativeProductionOperativePage = lazy(() => import('./pages/ecs-cards/CreativeProductionOperativePage'))
+const CreativeProductionTechnicianPage = lazy(() => import('./pages/ecs-cards/CreativeProductionTechnicianPage'))
+const CreativeProductionManagerPage = lazy(() => import('./pages/ecs-cards/CreativeProductionManagerPage'))
+const IscveAvEngineerPage = lazy(() => import('./pages/ecs-cards/IscveAvEngineerPage'))
+const IscveSoundEngineerPage = lazy(() => import('./pages/ecs-cards/IscveSoundEngineerPage'))
+const AvixaCommercialAvIntegratorPage = lazy(() => import('./pages/ecs-cards/AvixaCommercialAvIntegratorPage'))
+const RadioAndTelevisionElectricianPage = lazy(() => import('./pages/ecs-cards/RadioAndTelevisionElectricianPage'))
+const SiteSupervisorPage = lazy(() => import('./pages/ecs-cards/SiteSupervisorPage'))
+const SiteManagerPage = lazy(() => import('./pages/ecs-cards/SiteManagerPage'))
+const ContractsManagerPage = lazy(() => import('./pages/ecs-cards/ContractsManagerPage'))
+const ProjectManagerPage = lazy(() => import('./pages/ecs-cards/ProjectManagerPage'))
+const AcademicallyQualifiedPersonAqpPage = lazy(() => import('./pages/ecs-cards/AcademicallyQualifiedPersonAqpPage'))
+const ProfessionallyQualifiedPersonPqpPage = lazy(() => import('./pages/ecs-cards/ProfessionallyQualifiedPersonPqpPage'))
+const VehicleInstallerPage = lazy(() => import('./pages/ecs-cards/VehicleInstallerPage'))
+const GateSafeInstallerPage = lazy(() => import('./pages/ecs-cards/GateSafeInstallerPage'))
+const SllLightingProfessionalPage = lazy(() => import('./pages/ecs-cards/SllLightingProfessionalPage'))
+const CalculatorsPage = lazy(() => import('./pages/CalculatorsPage'))
+const AM2SimulatorPage = lazy(() => import('./pages/AM2SimulatorPage'))
 
 // User Dashboard Pages
-import ECSDashboard from './pages/ECSDashboard'
-import StudyPlanPage from './pages/StudyPlanPage'
-import AIQuizGeneratorPage from './pages/AIQuizGeneratorPage'
-import AffiliatePage from './pages/AffiliatePage'
-import AnalyticsPage from './pages/AnalyticsPage'
-import MyLibraryPage from './pages/MyLibraryPage'
-import MyMistakesPage from './pages/MyMistakesPage'
-import QuickReviewPage from './pages/QuickReviewPage'
-import FlashcardsPage from './pages/FlashcardsPage'
-import WrongQuestionsPage from './pages/WrongQuestionsPage'
-import AchievementsPage from './pages/AchievementsPage'
-import SettingsPage from './pages/SettingsPage'
-import SignOutPage from './pages/SignOutPage'
-import CheckoutPage from './pages/CheckoutPage'
+const ECSDashboard = lazy(() => import('./pages/ECSDashboard'))
+const StudyPlanPage = lazy(() => import('./pages/StudyPlanPage'))
+const AIQuizGeneratorPage = lazy(() => import('./pages/AIQuizGeneratorPage'))
+const AffiliatePage = lazy(() => import('./pages/AffiliatePage'))
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
+const MyLibraryPage = lazy(() => import('./pages/MyLibraryPage'))
+const MyMistakesPage = lazy(() => import('./pages/MyMistakesPage'))
+const QuickReviewPage = lazy(() => import('./pages/QuickReviewPage'))
+const FlashcardsPage = lazy(() => import('./pages/FlashcardsPage'))
+const WrongQuestionsPage = lazy(() => import('./pages/WrongQuestionsPage'))
+const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
+const AchievementsPage = lazy(() => import('./pages/AchievementsPage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage'))
+const SignOutPage = lazy(() => import('./pages/SignOutPage'))
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
 
 // Auth Pages
-import RegisterPage from './pages/admin/RegisterPage'
-import LoginPage from './pages/admin/LoginPage'
-import ForgotPasswordPage from './pages/ForgotPasswordPage'
-import ResetPasswordPage from './pages/ResetPasswordPage'
+const RegisterPage = lazy(() => import('./pages/admin/RegisterPage'))
+const LoginPage = lazy(() => import('./pages/admin/LoginPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 
 // Admin Pages
-import AdminDashboard from './pages/admin/AdminDashboard'
-import AdminUsers from './pages/admin/AdminUsers'
-import AdminUserDetail from './pages/admin/AdminUserDetail'
-import AdminTests from './pages/admin/AdminTests'
-import AdminQuestions from './pages/admin/AdminQuestions'
-import AdminBlog from './pages/admin/AdminBlog'
-import AdminAnalytics from './pages/admin/AdminAnalytics'
-import AdminSettings from './pages/admin/AdminSettings'
-import AdminPaymentRequests from './pages/admin/AdminPaymentRequests'
-import AdminCourses from './pages/admin/AdminCourses'
-import AdminCourseRequests from './pages/admin/AdminCourseRequests'
-import AdminInvoices from './pages/admin/AdminInvoices'
-import AdminQuotes from './pages/admin/AdminQuotes'
-import AdminRams from './pages/admin/AdminRams'
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminUserDetail = lazy(() => import('./pages/admin/AdminUserDetail'))
+const AdminTests = lazy(() => import('./pages/admin/AdminTests'))
+const AdminQuestions = lazy(() => import('./pages/admin/AdminQuestions'))
+const AdminBlog = lazy(() => import('./pages/admin/AdminBlog'))
+const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'))
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'))
+const AdminFestivals = lazy(() => import('./pages/admin/AdminFestivals'))
+const AdminPaymentRequests = lazy(() => import('./pages/admin/AdminPaymentRequests'))
+const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'))
+const AdminCourseRequests = lazy(() => import('./pages/admin/AdminCourseRequests'))
+const AdminInvoices = lazy(() => import('./pages/admin/AdminInvoices'))
+const AdminQuotes = lazy(() => import('./pages/admin/AdminQuotes'))
+const AdminRams = lazy(() => import('./pages/admin/AdminRams'))
+const AdminPages = lazy(() => import('./pages/admin/AdminPages'))
+const AdminAuditLog = lazy(() => import('./pages/admin/AdminAuditLog'))
+const AdminBroadcast = lazy(() => import('./pages/admin/AdminBroadcast'))
+const AdminSupportTickets = lazy(() => import('./pages/admin/AdminSupportTickets'))
+const AdminNotifications = lazy(() => import('./pages/admin/AdminNotifications'))
+const AdminQuestionReports = lazy(() => import('./pages/admin/AdminQuestionReports'))
+const AdminCardApplications = lazy(() => import('./pages/admin/AdminCardApplications'))
+const AdminSeoManager = lazy(() => import('./pages/admin/AdminSeoManager'))
+const AdminCoupons = lazy(() => import('./pages/admin/AdminCoupons'))
+const AdminSystemHealth = lazy(() => import('./pages/admin/AdminSystemHealth'))
 
 import Header from './components/Header'
 import Footer from './components/Footer'
+import ImpersonationBanner from './components/ImpersonationBanner'
 import MobileBottomNav from './components/MobileBottomNav'
 import ProtectedRoute from './components/ProtectedRoute'
 import AIAssistant from './components/AIAssistant'
-import GenericMockTest from './components/GenericMockTest'
 import PageTranslator from './components/PageTranslator'
+import CookieConsent from './components/CookieConsent'
 import XPToast from './components/XPToast'
-import { extraTests } from './data/extraTests'
+import SiteThemeLoader from './components/SiteThemeLoader'
+import AccessibilityToolbar from './components/AccessibilityToolbar'
+import OfflineStatusBanner from './components/OfflineStatusBanner'
+import { extraTestRoutePaths } from './data/extraTestsRoutes'
+
+// Lazy-loaded: GenericMockTest pulls in every "extra practice" question
+// bank (extraTests.js and everything it imports — 3,000+ questions,
+// 30,000+ lines). Previously imported eagerly above, which meant that
+// entire dataset was downloaded on every single page view, not just when
+// a visitor opened one of these tests. See data/extraTestsRoutes.js for
+// why route paths are listed separately from the test data itself.
+const GenericMockTest = lazy(() => import('./components/GenericMockTest'))
 
 // Routes that render their own sidebar shell (AppShell) instead of the
 // public marketing Header/Footer — the signed-in "app" area.
@@ -171,13 +210,16 @@ function SiteFooter() {
 function App() {
   return (
     <BrowserRouter>
+      <SiteThemeLoader />
       <PageTranslator />
       <SiteChrome />
+      <ImpersonationBanner />
+      <Suspense fallback={<div className="min-h-[40vh] flex items-center justify-center text-gray-400 text-sm">Loading…</div>}>
       <Routes>
         {/* Public + User Routes */}
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="courses" element={<CoursesPage />} />
+          <Route path="courses" element={<PageVisibilityGate pageKey="courses" title="Courses"><CoursesPage /></PageVisibilityGate>} />
           <Route path="courses/:courseId" element={<CourseDetailPage />} />
           <Route path="my-courses" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
           <Route path="mock-test" element={<MockTestsPage />} />
@@ -188,7 +230,8 @@ function App() {
           <Route path="ecs-skilled-worker-test" element={<SkilledWorkerTest />} />
           <Route path="ecs-supervisor-test" element={<SupervisorTest />} />
           <Route path="ecs-black-card-mock-test" element={<BlackCardMockTest />} />
-          {Object.keys(extraTests).map((path) => (
+          <Route path="ecs-managers-and-professionals-test" element={<ManagerTest />} />
+          {extraTestRoutePaths.map((path) => (
             <Route key={path} path={path.replace(/^\//, '')} element={<GenericMockTest />} />
           ))}
           <Route path="topic/:slug" element={<TopicTestPage />} />
@@ -197,6 +240,8 @@ function App() {
           <Route path="quick-review" element={<ProtectedRoute><AppShell><QuickReviewPage /></AppShell></ProtectedRoute>} />
           <Route path="flashcards" element={<ProtectedRoute><AppShell><FlashcardsPage /></AppShell></ProtectedRoute>} />
           <Route path="revision/wrong-questions" element={<ProtectedRoute><AppShell><WrongQuestionsPage /></AppShell></ProtectedRoute>} />
+          <Route path="smart-practice" element={<ProtectedRoute><AppShell><SmartPracticePage /></AppShell></ProtectedRoute>} />
+          <Route path="bookmarks" element={<ProtectedRoute><AppShell><BookmarksPage /></AppShell></ProtectedRoute>} />
           <Route path="achievements" element={<ProtectedRoute><AppShell><AchievementsPage /></AppShell></ProtectedRoute>} />
           <Route path="my-mistakes" element={<ProtectedRoute><AppShell><MyMistakesPage /></AppShell></ProtectedRoute>} />
           <Route path="my-library" element={<ProtectedRoute><AppShell><MyLibraryPage /></AppShell></ProtectedRoute>} />
@@ -204,18 +249,27 @@ function App() {
           <Route path="dashboard" element={<ProtectedRoute><ECSDashboard /></ProtectedRoute>} />
           <Route path="study-plan" element={<ProtectedRoute><AppShell><StudyPlanPage /></AppShell></ProtectedRoute>} />
           <Route path="ai-quiz-generator" element={<ProtectedRoute requirePro><AIQuizGeneratorPage /></ProtectedRoute>} />
-          <Route path="affiliate" element={<ProtectedRoute><AppShell><AffiliatePage /></AppShell></ProtectedRoute>} />
+          <Route path="affiliate" element={<ProtectedRoute><AppShell><PageVisibilityGate pageKey="affiliate" title="Affiliate"><AffiliatePage /></PageVisibilityGate></AppShell></ProtectedRoute>} />
           <Route path="refer" element={<Navigate to="/affiliate" replace />} />
-          <Route path="pricing" element={<PricingPage />} />
-          <Route path="plans" element={<PricingPlansPage />} />
+          <Route path="pricing" element={<PageVisibilityGate pageKey="pricing" title="Pricing"><PricingPage /></PageVisibilityGate>} />
+          <Route path="plans" element={<PageVisibilityGate pageKey="plans" title="Pricing Plans"><PricingPlansPage /></PageVisibilityGate>} />
           <Route path="checkout" element={<CheckoutPage />} />
-          <Route path="leaderboard" element={<LeaderboardPage />} />
-          <Route path="certificate" element={<ProtectedRoute requirePro><CertificatePage /></ProtectedRoute>} />
-          <Route path="book" element={<BookPage />} />
+          <Route path="leaderboard" element={<PageVisibilityGate pageKey="leaderboard" title="Leaderboard"><LeaderboardPage /></PageVisibilityGate>} />
+          <Route path="certificate" element={<ProtectedRoute requirePro><PageVisibilityGate pageKey="certificate" title="Certificate"><CertificatePage /></PageVisibilityGate></ProtectedRoute>} />
+          <Route path="book" element={<PageVisibilityGate pageKey="book" title="Book"><BookPage /></PageVisibilityGate>} />
           <Route path="ecscardbooking" element={<ECSCardBookingPage />} />
+          <Route path="my-card-application" element={<ProtectedRoute><AppShell><CardApplicationTrackerPage /></AppShell></ProtectedRoute>} />
+          <Route path="ecstestbooking" element={<ECSTestBookingPage />} />
+          <Route path="test-centre-finder" element={<TestCentreFinderPage />} />
+          <Route path="card-renewal-reminder" element={<ProtectedRoute><AppShell><CardRenewalReminderPage /></AppShell></ProtectedRoute>} />
           <Route path="cards" element={<CardsPage />} />
           <Route path="types-of-ecs-cards" element={<CardsPage />} />
-          <Route path="ecs-card-info" element={<ECSCardInfoPage />} />
+          <Route path="ecs-card-info" element={<PageVisibilityGate pageKey="ecs-card-info" title="ECS Card Info"><ECSCardInfoPage /></PageVisibilityGate>} />
+          <Route path="which-ecs-card" element={<PageVisibilityGate pageKey="which-ecs-card" title="Which ECS Card Do I Need?"><CardEligibilityWizardPage /></PageVisibilityGate>} />
+          <Route path="exam-day-checklist" element={<PageVisibilityGate pageKey="exam-day-checklist" title="Exam Day Checklist"><ExamDayChecklistPage /></PageVisibilityGate>} />
+          <Route path="team" element={<ProtectedRoute requirePro><AppShell><TeamDashboardPage /></AppShell></ProtectedRoute>} />
+          <Route path="team/audit-report" element={<ProtectedRoute requirePro><AppShell><TeamAuditReportPage /></AppShell></ProtectedRoute>} />
+          <Route path="team/accept/:inviteId" element={<ProtectedRoute><AppShell><TeamInviteAcceptPage /></AppShell></ProtectedRoute>} />
           <Route path="ecs-cards/labourer" element={<LabourerPage />} />
           <Route path="ecs-cards/electrical-labourer" element={<ElectricalLabourerPage />} />
           <Route path="ecs-cards/apprentice" element={<ApprenticePage />} />
@@ -270,17 +324,20 @@ function App() {
           <Route path="ecs-cards/sll-lighting-professional" element={<SllLightingProfessionalPage />} />
           <Route path="blog" element={<BlogPage />} />
           <Route path="blog/:slug" element={<BlogPostPage />} />
-          <Route path="safety-signs" element={<SafetySignsPage />} />
-          <Route path="calculators" element={<CalculatorsPage />} />
-          <Route path="calculators/:calcId" element={<CalculatorsPage />} />
-          <Route path="am2-simulator" element={<AM2SimulatorPage />} />
-          <Route path="study-material" element={<StudyMaterialPage />} />
-          <Route path="videos" element={<VideoLibraryPage />} />
-          <Route path="community" element={<CommunityPage />} />
+          <Route path="page/:slug" element={<DynamicPage />} />
+          <Route path="safety-signs" element={<PageVisibilityGate pageKey="safety-signs" title="Safety Signs"><SafetySignsPage /></PageVisibilityGate>} />
+          <Route path="calculators" element={<PageVisibilityGate pageKey="calculators" title="Calculators"><CalculatorsPage /></PageVisibilityGate>} />
+          <Route path="calculators/:calcId" element={<PageVisibilityGate pageKey="calculators" title="Calculators"><CalculatorsPage /></PageVisibilityGate>} />
+          <Route path="am2-simulator" element={<PageVisibilityGate pageKey="am2-simulator" title="AM2 Simulator"><AM2SimulatorPage /></PageVisibilityGate>} />
+          <Route path="study-material" element={<PageVisibilityGate pageKey="study-material" title="Study Material"><StudyMaterialPage /></PageVisibilityGate>} />
+          <Route path="videos" element={<PageVisibilityGate pageKey="videos" title="Video Library"><VideoLibraryPage /></PageVisibilityGate>} />
+          <Route path="community" element={<PageVisibilityGate pageKey="community" title="Community"><CommunityPage /></PageVisibilityGate>} />
           <Route path="settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-          <Route path="about" element={<AboutPage />} />   ← ye line add karo
-          <Route path="terms" element={<TermsPage />} />
-          <Route path="privacy" element={<PrivacyPage />} />
+          <Route path="about" element={<PageVisibilityGate pageKey="about" title="About"><AboutPage /></PageVisibilityGate>} />
+          <Route path="contact" element={<PageVisibilityGate pageKey="contact" title="Contact"><ContactPage /></PageVisibilityGate>} />
+          <Route path="terms" element={<PageVisibilityGate pageKey="terms" title="Terms"><TermsPage /></PageVisibilityGate>} />
+          <Route path="privacy" element={<PageVisibilityGate pageKey="privacy" title="Privacy"><PrivacyPage /></PageVisibilityGate>} />
+          <Route path="cookies" element={<PageVisibilityGate pageKey="cookies" title="Cookies"><CookiesPage /></PageVisibilityGate>} />
           <Route path="signout" element={<SignOutPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -292,26 +349,41 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="users/:id" element={<AdminUserDetail />} />
+          <Route path="users" element={<ProtectedRoute requireSuperAdmin><AdminUsers /></ProtectedRoute>} />
+          <Route path="users/:id" element={<ProtectedRoute requireSuperAdmin><AdminUserDetail /></ProtectedRoute>} />
           <Route path="tests" element={<AdminTests />} />
           <Route path="questions" element={<AdminQuestions />} />
           <Route path="blog" element={<AdminBlog />} />
-          <Route path="analytics" element={<AdminAnalytics />} />
-          <Route path="settings" element={<AdminSettings />} />
-          <Route path="payment-requests" element={<AdminPaymentRequests />} />
-          <Route path="invoices" element={<AdminInvoices />} />
-          <Route path="quotes" element={<AdminQuotes />} />
-          <Route path="rams" element={<AdminRams />} />
+          <Route path="analytics" element={<ProtectedRoute requireSuperAdmin><AdminAnalytics /></ProtectedRoute>} />
+          <Route path="settings" element={<ProtectedRoute requireSuperAdmin><AdminSettings /></ProtectedRoute>} />
+          <Route path="festivals" element={<AdminFestivals />} />
+          <Route path="payment-requests" element={<ProtectedRoute requireSuperAdmin><AdminPaymentRequests /></ProtectedRoute>} />
+          <Route path="invoices" element={<ProtectedRoute requireSuperAdmin><AdminInvoices /></ProtectedRoute>} />
+          <Route path="quotes" element={<ProtectedRoute requireSuperAdmin><AdminQuotes /></ProtectedRoute>} />
+          <Route path="rams" element={<ProtectedRoute requireSuperAdmin><AdminRams /></ProtectedRoute>} />
+          <Route path="pages" element={<AdminPages />} />
+          <Route path="audit-log" element={<ProtectedRoute requireSuperAdmin><AdminAuditLog /></ProtectedRoute>} />
+          <Route path="broadcast" element={<ProtectedRoute requireSuperAdmin><AdminBroadcast /></ProtectedRoute>} />
+          <Route path="support-tickets" element={<AdminSupportTickets />} />
+          <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="question-reports" element={<AdminQuestionReports />} />
+          <Route path="card-applications" element={<AdminCardApplications />} />
+          <Route path="seo-manager" element={<AdminSeoManager />} />
+          <Route path="coupons" element={<ProtectedRoute requireSuperAdmin><AdminCoupons /></ProtectedRoute>} />
+          <Route path="system-health" element={<ProtectedRoute requireSuperAdmin><AdminSystemHealth /></ProtectedRoute>} />
           <Route path="courses" element={<AdminCourses />} />
-          <Route path="course-requests" element={<AdminCourseRequests />} />
+          <Route path="course-requests" element={<ProtectedRoute requireSuperAdmin><AdminCourseRequests /></ProtectedRoute>} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      </Suspense>
       <SiteFooter />
       <AIAssistant />
       <XPToast />
+      <CookieConsent />
+      <AccessibilityToolbar />
+      <OfflineStatusBanner />
     </BrowserRouter>
   )
 }

@@ -96,3 +96,4 @@ export function monthlySavingsVsWeekly() {
 export function lifetimeBreakEvenMonths() {
   return Math.round(PLANS.lifetime.priceValue / PLANS.monthly.priceValue)
 }
+

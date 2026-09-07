@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../context/AuthContext'
 import LanguageSwitcher from './LanguageSwitcher'
 import ThemeToggle from './ThemeToggle'
+import NotificationBell from './NotificationBell'
 
 // Lightweight site search index — no backend required, just jumps the user
 // to the right page. Add to this list as new pages are added.
@@ -23,6 +24,9 @@ const SEARCH_INDEX = [
   { label: 'Supervisor Test', path: '/ecs-supervisor-test', keywords: 'gold card supervisor' },
   { label: 'Managers & Professionals Test', path: '/ecs-managers-and-professionals-test', keywords: 'black card manager professional' },
   { label: 'ECS Card Info', path: '/ecs-card-info', keywords: 'card info which card' },
+  { label: 'Which ECS Card Do I Need?', path: '/which-ecs-card', keywords: 'which card do i need eligibility checker wizard quiz' },
+  { label: 'Exam Day Checklist', path: '/exam-day-checklist', keywords: 'exam day checklist what to bring id documents' },
+  { label: 'Team / Employer Dashboard', path: '/team', keywords: 'team employer dashboard site manager workforce card tracker' },
   { label: 'ECS Cards Explained', path: '/cards', keywords: 'ecs cards types' },
   { label: 'Safety Signs', path: '/safety-signs', keywords: 'safety signs symbols' },
   { label: 'Electrician Calculators', path: '/calculators', keywords: 'calculators ohms law voltage drop cable size three phase vat lux calculator' },
@@ -175,7 +179,7 @@ const Header = () => {
 
               {isSearchOpen && (
                 <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-2xl shadow-2xl shadow-gray-200 border border-gray-100 p-3 z-50 animate-fadeIn">
-                  <div className="flex items-center gap-2 px-2 pb-2 border-b border-gray-100">
+                  <div className="flex items-center gap-2 px-2 pb-2 border-b border-gray-100 focus-within:border-primary transition-colors">
                     <Search size={15} className="text-gray-400 shrink-0" />
                     <input
                       ref={searchInputRef}
@@ -208,6 +212,7 @@ const Header = () => {
 
             {/* Right section — desktop */}
             <div className="hidden xl:flex items-center gap-3 shrink-0">
+              <NotificationBell />
               <ThemeToggle />
               <LanguageSwitcher compact />
               {user ? (
@@ -331,6 +336,7 @@ const Header = () => {
               >
                 <Search size={20} className="text-gray-600" />
               </button>
+              <NotificationBell />
               <ThemeToggle />
               <LanguageSwitcher compact />
               <button
@@ -369,7 +375,7 @@ const Header = () => {
         {/* Mobile search panel */}
         {isSearchOpen && (
           <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-gray-50">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 focus-within:border-primary transition-colors">
               <Search size={15} className="text-gray-400 shrink-0" />
               <input
                 ref={searchInputRef}

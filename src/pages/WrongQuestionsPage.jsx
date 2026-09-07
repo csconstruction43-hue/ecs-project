@@ -7,15 +7,20 @@
 // "Wrong-to-Right" badge).
 import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { RotateCcw, CheckCircle2, XCircle, PartyPopper } from 'lucide-react'
+import { RotateCcw, CheckCircle2, XCircle, PartyPopper, Star, StickyNote } from 'lucide-react'
 import { getWrongQuestionsBank, removeFromWrongBank } from '../lib/testResults'
 import { recordWrongQuestionCleared } from '../lib/gamification'
+import { shuffle } from '../lib/questionBank'
+import { toggleBookmark, isBookmarked, getNote, setNote } from '../lib/studyTools'
 
 export default function WrongQuestionsPage() {
   const [bank, setBank] = useState(getWrongQuestionsBank)
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState(null)
   const [cleared, setCleared] = useState(0)
+  const [noteOpen, setNoteOpen] = useState(false)
+  const [noteDraft, setNoteDraft] = useState('')
+  const [, forceRefresh] = useState(0)
 
   const current = bank[index]
 
@@ -24,13 +29,13 @@ export default function WrongQuestionsPage() {
     // Wrong-answers bank only stores the correct answer (not the original
     // 4 options), so build a light multiple-choice from it: correct answer
     // plus 3 shuffled distractors pulled from other questions in the bank.
-    const distractors = bank
-      .filter((q) => q.question !== current.question)
-      .map((q) => q.correctAnswer)
-      .filter((a, i, arr) => a && a !== current.correctAnswer && arr.indexOf(a) === i)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
-    return [current.correctAnswer, ...distractors].sort(() => Math.random() - 0.5)
+    const distractors = shuffle(
+      bank
+        .filter((q) => q.question !== current.question)
+        .map((q) => q.correctAnswer)
+        .filter((a, i, arr) => a && a !== current.correctAnswer && arr.indexOf(a) === i)
+    ).slice(0, 3)
+    return shuffle([current.correctAnswer, ...distractors])
   }, [current, bank])
 
   if (bank.length === 0) {
@@ -62,7 +67,27 @@ export default function WrongQuestionsPage() {
     const freshBank = getWrongQuestionsBank()
     setBank(freshBank)
     setSelected(null)
+    setNoteOpen(false)
     setIndex((i) => (freshBank.length === 0 ? 0 : i % freshBank.length))
+  }
+
+  const handleBookmark = () => {
+    if (!current) return
+    toggleBookmark({
+      text: current.question,
+      topic: current.topic,
+      correct: current.correctAnswer,
+      explanation: current.explanation,
+      source: 'wrong-question',
+    })
+    forceRefresh((n) => n + 1)
+  }
+
+  const saveNote = () => {
+    if (!current) return
+    setNote(current.question, noteDraft)
+    setNoteOpen(false)
+    forceRefresh((n) => n + 1)
   }
 
   return (
@@ -81,7 +106,47 @@ export default function WrongQuestionsPage() {
         <div className="text-xs font-semibold text-red-500 uppercase tracking-wide mb-1">
           {current.topic} · Missed {current.timesWrong}x
         </div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-5">{current.question}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-3">{current.question}</h2>
+
+        <div className="flex items-center gap-2 mb-5">
+          <button
+            onClick={handleBookmark}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors ${
+              isBookmarked(current.question)
+                ? 'bg-yellow-50 border-yellow-300 text-yellow-700 dark:bg-yellow-900/20 dark:border-yellow-700 dark:text-yellow-400'
+                : 'border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Star size={13} fill={isBookmarked(current.question) ? 'currentColor' : 'none'} /> {isBookmarked(current.question) ? 'Bookmarked' : 'Bookmark'}
+          </button>
+          <button
+            onClick={() => {
+              if (!noteOpen) setNoteDraft(getNote(current.question))
+              setNoteOpen((o) => !o)
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs font-semibold text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800"
+          >
+            <StickyNote size={13} /> {getNote(current.question) ? 'Edit note' : 'Add note'}
+          </button>
+        </div>
+
+        {noteOpen && (
+          <div className="mb-5 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg p-3">
+            <textarea
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              rows={3}
+              placeholder="Write a personal note or memory trick for this question..."
+              className="w-full text-sm bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-2 text-gray-900 dark:text-slate-100"
+            />
+            <button
+              onClick={saveNote}
+              className="mt-2 text-xs font-semibold bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700"
+            >
+              Save note
+            </button>
+          </div>
+        )}
 
         <div className="space-y-2.5">
           {options.map((opt, i) => {

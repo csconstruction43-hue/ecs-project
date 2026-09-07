@@ -14,7 +14,10 @@ const PING_INTERVAL_MS = 20_000
 export function useActivityPing() {
   const location = useLocation()
   const pageRef = useRef(location.pathname)
-  pageRef.current = location.pathname
+
+  useEffect(() => {
+    pageRef.current = location.pathname
+  }, [location.pathname])
 
   useEffect(() => {
     if (!getToken()) return undefined // only ping for signed-in users
@@ -35,6 +38,5 @@ export function useActivityPing() {
       clearInterval(id)
     }
     // Re-arm on every path change so the "current page" ping is fresh.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname])
 }

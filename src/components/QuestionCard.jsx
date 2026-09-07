@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { FaCheck, FaTimes, FaLightbulb } from 'react-icons/fa'
 import AIExplainButton from './AIExplainButton'
 import QuestionAudio from './QuestionAudio'
+import ReportQuestionButton from './ReportQuestionButton'
 
 function QuestionCard({ question, onAnswer, showExplanation, currentNumber, totalQuestions, isPro }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -39,6 +40,15 @@ function QuestionCard({ question, onAnswer, showExplanation, currentNumber, tota
       <h3 className="text-xl font-semibold mb-4">{question.text}</h3>
 
       <QuestionAudio text={question.text} isPro={isPro} />
+
+      <div className="flex justify-end -mt-2 mb-2">
+        <ReportQuestionButton
+          questionId={question.id}
+          questionText={question.text}
+          options={question.options}
+          testLabel="ECS Black Card (Manager) Test"
+        />
+      </div>
 
       {/* Options */}
       <div className="space-y-3">

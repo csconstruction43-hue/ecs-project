@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { PLAN_LIST, PLANS, monthlySavingsVsWeekly, lifetimeBreakEvenMonths } from '../lib/pricingPlans'
 
 const PLAN_ICON = {
-  free: <FaCheck className="text-emerald-500" />,
+  free: <FaCheck className="text-blue-500" />,
   weekly: <FaRedoAlt className="text-blue-500" />,
   monthly: <FaChartLine className="text-blue-500" />,
   lifetime: <FaTrophy className="text-blue-500" />,
@@ -36,7 +36,7 @@ const faqs = [
 ]
 
 function renderCell(value) {
-  if (value === true) return <FaCheck className="text-emerald-500 mx-auto" />
+  if (value === true) return <FaCheck className="text-blue-500 mx-auto" />
   if (value === false) return <FaTimes className="text-gray-300 mx-auto" />
   return <span className="text-gray-600">{value}</span>
 }
@@ -50,7 +50,7 @@ function PricingPage() {
     <div className="min-h-screen bg-gray-50">
       <Seo
         title="ECSPrep Pricing | Free & Pro Plans for ECS Mock Test Practice"
-        description="Compare ECSPrep's free and Pro plans. Unlock unlimited ECS mock tests, AI explanations, all 22 ECS topics, and full analytics."
+        description="Compare ECSPrep's free and Pro plans. Unlock unlimited ECS mock tests, AI explanations, all 22 ECS test routes, and full analytics."
         path="/pricing"
       />
 
@@ -68,9 +68,9 @@ function PricingPage() {
           </p>
 
           {isPro ? (
-            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-400/30 rounded-full px-4 py-2 mt-6">
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-400/30 rounded-full px-4 py-2 mt-6">
               <FaCrown className="text-blue-400" />
-              <p className="text-sm text-emerald-200 font-semibold">
+              <p className="text-sm text-blue-200 font-semibold">
                 You're on the {user?.plan || 'Pro'} plan — thanks for being a Pro member.
               </p>
             </div>
@@ -87,7 +87,7 @@ function PricingPage() {
 
       <div className="container mx-auto max-w-6xl px-4 -mt-16 pb-16">
         {/* Pricing Cards Grid */}
-        <div className="grid md:grid-cols-4 gap-6 mb-16">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-16">
           {PLAN_LIST.map((plan) => (
             <div
               key={plan.id}
@@ -116,7 +116,7 @@ function PricingPage() {
               <ul className="text-left space-y-2.5 text-sm mb-6 flex-1">
                 {plan.features.map((feature, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <FaCheck className="text-emerald-500 mt-1 shrink-0" size={11} />
+                    <FaCheck className="text-blue-500 mt-1 shrink-0" size={11} />
                     <span className="text-gray-700">{feature}</span>
                   </li>
                 ))}
@@ -134,7 +134,7 @@ function PricingPage() {
               </Link>
 
               {plan.id === 'monthly' && (
-                <p className="text-xs text-emerald-600 mt-3 font-medium">Save ~{savingPct}% vs Weekly</p>
+                <p className="text-xs text-blue-600 mt-3 font-medium">Save ~{savingPct}% vs Weekly</p>
               )}
               {plan.id === 'lifetime' && (
                 <p className="text-xs text-blue-600 mt-3 font-medium">Pays for itself in {breakEvenMonths} months</p>
@@ -231,13 +231,13 @@ function PricingPage() {
           <div className="mt-8 text-center bg-white rounded-xl p-6 border border-gray-100">
             <FaEnvelope className="text-blue-500 text-2xl mx-auto mb-2" />
             <p className="text-gray-500">
-              Need help choosing? Email <a href="mailto:support@ecsmocktest.uk" className="text-blue-600 font-semibold hover:underline">support@ecsmocktest.uk</a> and we'll point you to the right plan.
+              Need help choosing? Email <a href="mailto:support@electricianprep.co.uk" className="text-blue-600 font-semibold hover:underline">support@electricianprep.co.uk</a> and we'll point you to the right plan.
             </p>
           </div>
         </div>
 
         <div className="mt-12 text-center text-xs text-gray-400 border-t border-gray-100 pt-8">
-          <p>ECSMockTest.uk is not affiliated with ECS or any official certification scheme.</p>
+          <p>ECSPrep is not affiliated with ECS, JIB, or any official certification scheme.</p>
           <p className="mt-1">All prices are in GBP (£) and include VAT where applicable.</p>
         </div>
       </div>

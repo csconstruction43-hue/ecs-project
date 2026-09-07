@@ -26,6 +26,8 @@ const ACTIVITY_LABELS = {
   signup: 'signed up',
   ping: 'is browsing',
   test_submit: 'submitted a test',
+  suspended: 'was suspended',
+  unsuspended: 'was reinstated',
 }
 
 const AdminDashboard = () => {

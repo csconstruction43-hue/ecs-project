@@ -11,43 +11,18 @@ function AnalyticsPage() {
   const [testHistory, setTestHistory] = useState([])
   const [selectedPeriod, setSelectedPeriod] = useState('week') // week, month, year
 
-  // Mock data for demonstration
-  useEffect(() => {
-    // Load test history from localStorage
-    const savedHistory = localStorage.getItem('testHistory')
-    if (savedHistory) {
-      const history = JSON.parse(savedHistory)
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: kicks off data load on mount
-      setTestHistory(history)
-      calculateStats(history)
-    } else {
-      // Sample data for demo
-      const sampleHistory = generateSampleData()
-      setTestHistory(sampleHistory)
-      calculateStats(sampleHistory)
-    }
-  }, [])
-
-  const generateSampleData = () => {
-    const data = []
-    const today = new Date()
-    for (let i = 0; i < 20; i++) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - i)
-      data.push({
-        id: i,
-        date: date.toISOString(),
-        score: Math.floor(Math.random() * 40) + 60, // 60-100
-        subject: ['Math', 'Science', 'English', 'History'][Math.floor(Math.random() * 4)],
-        duration: Math.floor(Math.random() * 60) + 30, // 30-90 minutes
-        questions: Math.floor(Math.random() * 20) + 10,
-        correct: Math.floor(Math.random() * 15) + 5
-      })
-    }
-    return data.sort((a, b) => new Date(a.date) - new Date(b.date))
-  }
+  // Load real test history only — never fabricate demo data for an empty account.
+  const generateSampleData = () => []
 
   const calculateStats = (history) => {
+    if (history.length === 0) {
+      setTestsThisWeek(0)
+      setTotalTests(0)
+      setAverageScore(0)
+      setStreak(0)
+      setLongestStreak(0)
+      return
+    }
     // Calculate tests this week
     const now = new Date()
     const weekStart = new Date(now.setDate(now.getDate() - now.getDay()))
@@ -85,6 +60,27 @@ function AnalyticsPage() {
     setStreak(currentStreak)
     setLongestStreak(maxStreak)
   }
+
+  useEffect(() => {
+    // Load test history from localStorage
+    const savedHistory = localStorage.getItem('testHistory')
+    if (savedHistory) {
+      const history = JSON.parse(savedHistory)
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: kicks off data load on mount
+      setTestHistory(history)
+      calculateStats(history)
+    } else {
+      // Sample data for demo
+      const sampleHistory = generateSampleData()
+      setTestHistory(sampleHistory)
+      calculateStats(sampleHistory)
+    }
+  }, [])
+
+
+  
+
+  
 
   const getLast7Tests = () => {
     return testHistory.slice(-7).map(test => test.score)

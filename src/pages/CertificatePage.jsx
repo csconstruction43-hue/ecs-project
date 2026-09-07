@@ -3,9 +3,11 @@
 // HTML/CSS + window.print() so it needs zero extra npm packages, works
 // offline, and lets the user save it as a PDF via their browser's built-in
 // print dialog ("Save as PDF" destination).
-import React from 'react'
+import React, { useState } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { Trophy, Printer, ArrowLeft } from 'lucide-react'
+import { FaLinkedin } from 'react-icons/fa'
+import { SITE_URL } from '../components/Seo'
 import { useAuth } from '../context/AuthContext'
 import Seo from '../components/Seo'
 
@@ -14,6 +16,9 @@ function CertificatePage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { testLabel, score, total, percentage } = location.state || {}
+  const [dateStr] = useState(() => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }))
+  const [certificateId] = useState(() => `ECS-${Date.now().toString(36).toUpperCase()}`)
+  const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`
 
   if (!testLabel) {
     return (
@@ -30,9 +35,6 @@ function CertificatePage() {
     )
   }
 
-  const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-  const certificateId = `ECS-${Date.now().toString(36).toUpperCase()}`
-
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 print:bg-white print:py-0">
       <Seo title="Your Certificate | ECSPrep" path="/certificate" noindex />
@@ -42,12 +44,23 @@ function CertificatePage() {
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
           <ArrowLeft size={18} /> Back to results
         </button>
-        <button
-          onClick={() => window.print()}
-          className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition"
-        >
-          <Printer size={18} /> Print / Save as PDF
-        </button>
+        <div className="flex items-center gap-3">
+          <a
+            href={linkedInShareUrl}
+            target="_blank"
+            rel="noreferrer"
+            title="Share your progress on LinkedIn"
+            className="flex items-center gap-2 bg-[#0A66C2] text-white px-4 py-2.5 rounded-lg font-semibold hover:opacity-90 transition"
+          >
+            <FaLinkedin size={18} /> <span className="hidden sm:inline">Share</span>
+          </a>
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition"
+          >
+            <Printer size={18} /> Print / Save as PDF
+          </button>
+        </div>
       </div>
 
       {/* The certificate itself */}
@@ -90,7 +103,7 @@ function CertificatePage() {
 
         <p className="text-center text-xs text-gray-400 mt-8">
           This certificate confirms practice-test performance on ECSPrep. It is not an official ECS/ECS
-          qualification — book your official test at citb.co.uk once you're consistently passing here.
+          qualification — book your official test via MyECS at ecscard.org.uk once you're consistently passing here.
         </p>
       </div>
     </div>

@@ -545,7 +545,7 @@ function MockTestsPage() {
       >
         <div>
           <div style={{ fontWeight: '700', fontSize: '16px', marginBottom: '4px' }}>🎯 New: Practice the HSE Assessment by topic</div>
-          <div style={{ fontSize: '13px', opacity: 0.9 }}>Drill any of the 11 ECS HSE topics individually — all questions from the real, published question bank.</div>
+          <div style={{ fontSize: '13px', opacity: 0.9 }}>Drill any of the 11 HSE syllabus topics individually — all questions from the real, published question bank.</div>
         </div>
         <span style={{ background: 'rgba(255,255,255,0.2)', padding: '8px 18px', borderRadius: '999px', fontSize: '13px', fontWeight: '600', whiteSpace: 'nowrap' }}>
           Start practicing →

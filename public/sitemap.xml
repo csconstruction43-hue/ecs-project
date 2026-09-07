@@ -170,4 +170,44 @@
   <!-- Legal -->
   <url><loc>https://www.electricianprep.co.uk/terms</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
   <url><loc>https://www.electricianprep.co.uk/privacy</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/cookies</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/about</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/contact</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-provisional-card-guide</loc><lastmod>2026-08-03</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/coshh-for-electricians-guide</loc><lastmod>2026-08-07</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/overhead-underground-power-lines-safety-guide</loc><lastmod>2026-08-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/asbestos-awareness-electricians-guide</loc><lastmod>2026-08-15</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/lone-working-safety-electricians-guide</loc><lastmod>2026-08-19</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/safe-isolation-procedure-electricians-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/hand-arm-vibration-syndrome-havs-electricians</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/noise-at-work-regulations-electricians-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/uk-electrical-cable-colour-coding-explained</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/niceic-napit-registration-guide-electricians</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electric-shock-first-aid-guide-electricians</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/confined-spaces-regulations-electricians-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/emergency-lighting-testing-bs5266-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/fire-extinguisher-types-guide-electricians</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ipaf-pasma-access-equipment-electricians-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/toolbox-talks-electricians-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/rams-risk-assessment-method-statement-electricians-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrician-jobs-uk-cv-interview-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/domestic-vs-commercial-electrician-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/public-liability-insurance-electricians-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ecs-card-overseas-non-uk-electricians-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/reading-electrical-drawings-schematics-guide</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/sssts-explained-site-supervisor-safety-training-scheme</loc><lastmod>2026-08-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/mcb-vs-rcbo-vs-fuse-protective-devices-guide</loc><lastmod>2026-08-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ip-ratings-explained-electricians-guide</loc><lastmod>2026-08-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/eicr-landlords-legal-duties-guide-electricians</loc><lastmod>2026-08-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ir35-contractor-status-self-employed-electricians-guide</loc><lastmod>2026-08-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/cable-sizing-current-carrying-capacity-bs7671-guide</loc><lastmod>2026-09-04</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/permit-to-work-systems-electricians-guide</loc><lastmod>2026-09-04</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/working-in-roof-spaces-confined-voids-safety-guide</loc><lastmod>2026-09-04</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/portable-generator-carbon-monoxide-safety-guide</loc><lastmod>2026-09-04</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/discrimination-selective-coordination-protective-devices</loc><lastmod>2026-09-04</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrical-snagging-handover-certificates-guide</loc><lastmod>2026-09-04</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/ev-charger-installation-flats-apartments-leasehold-rules-guide</loc><lastmod>2026-09-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/garage-conversion-electrical-work-rules-mistakes-guide</loc><lastmod>2026-09-09</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/data-centre-server-room-electrical-installations-guide</loc><lastmod>2026-09-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.electricianprep.co.uk/blog/electrical-installations-schools-educational-buildings-guide</loc><lastmod>2026-09-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>

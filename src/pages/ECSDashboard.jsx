@@ -1,10 +1,14 @@
 import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { HelpCircle, Clock, Trophy, CheckCircle2, Target, ArrowRight, Crown, Flame, Layers, RotateCcw, Sparkles } from 'lucide-react'
+import { HelpCircle, Clock, Trophy, CheckCircle2, Target, ArrowRight, Crown, Flame, Layers, RotateCcw, Sparkles, Star, Clock3, MapPin, IdCard } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import AppShell from '../components/AppShell'
 import { dashboardTopics, matchTopic } from '../data/dashboardTopics'
 import { loadState, levelForXP } from '../lib/gamification'
+import { getAllQuestions } from '../lib/questionBank'
+import { countDue } from '../lib/studyTools'
+import DailyChallengeCard from '../components/DailyChallengeCard'
+import CardRenewalBanner from '../components/CardRenewalBanner'
 
 const PASS_THRESHOLD = 70 // % — matches the real ECS pass mark used elsewhere in the app
 
@@ -32,9 +36,10 @@ function StatCard({ icon: Icon, value, label, sub }) {
 function ECSDashboard() {
   const { user } = useAuth()
   const firstName = (user?.name || 'there').split(' ')[0]
-  const history = useMemo(loadHistory, [])
-  const gamification = useMemo(loadState, [])
+  const history = useMemo(() => loadHistory(), [])
+  const gamification = useMemo(() => loadState(), [])
   const levelInfo = useMemo(() => levelForXP(gamification.xp), [gamification.xp])
+  const dueCount = useMemo(() => countDue(getAllQuestions().map((q) => q.text)), [])
 
   const stats = useMemo(() => {
     const testsTaken = history.length
@@ -113,8 +118,25 @@ function ECSDashboard() {
           </div>
         </Link>
 
+        {/* Daily Challenge */}
+        <DailyChallengeCard className="mb-6" />
+
+        {/* Card renewal nudge — silent unless a reminder is set and close */}
+        <CardRenewalBanner className="mb-6" />
+
+        {/* Spaced-repetition nudge */}
+        {dueCount > 0 && (
+          <Link to="/flashcards" className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 hover:bg-amber-100 transition-colors">
+            <div className="w-9 h-9 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0"><Clock3 size={18} /></div>
+            <div>
+              <div className="font-semibold text-amber-900 text-sm">{dueCount} flashcard{dueCount !== 1 ? 's' : ''} due for review today</div>
+              <div className="text-xs text-amber-700">Spaced repetition works best little and often — review now →</div>
+            </div>
+          </Link>
+        )}
+
         {/* Revision Centre quick links */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <Link to="/flashcards" className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 hover:border-blue-200 transition-colors">
             <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><Layers size={18} /></div>
             <div>
@@ -141,6 +163,31 @@ function ECSDashboard() {
             <div>
               <div className="font-semibold text-gray-900 text-sm">AI Quiz Generator</div>
               <div className="text-xs text-gray-500">Instant quiz, any topic</div>
+            </div>
+          </Link>
+          <Link to="/bookmarks" className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 hover:border-blue-200 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-yellow-50 text-yellow-600 flex items-center justify-center shrink-0"><Star size={18} /></div>
+            <div>
+              <div className="font-semibold text-gray-900 text-sm">Bookmarks &amp; Notes</div>
+              <div className="text-xs text-gray-500">Your saved questions</div>
+            </div>
+          </Link>
+        </div>
+
+        {/* UK candidate tools */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <Link to="/test-centre-finder" className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 hover:border-blue-200 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0"><MapPin size={18} /></div>
+            <div>
+              <div className="font-semibold text-gray-900 text-sm">Test Centre Finder</div>
+              <div className="text-xs text-gray-500">Find your nearest ECS venue</div>
+            </div>
+          </Link>
+          <Link to="/card-renewal-reminder" className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 hover:border-blue-200 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0"><IdCard size={18} /></div>
+            <div>
+              <div className="font-semibold text-gray-900 text-sm">Card Renewal Reminder</div>
+              <div className="text-xs text-gray-500">Track your card's expiry date</div>
             </div>
           </Link>
         </div>

@@ -5,7 +5,7 @@ import {
   Lock, Shield, CreditCard, Smartphone, LogOut,
   CheckCircle, AlertCircle, Loader2,
   Camera, Trash2, Mail, Phone, MapPin,
-  Award, Clock, RefreshCw, X, BookOpen
+  Award, Clock, RefreshCw, X, BookOpen, Download, CalendarClock, ShieldCheck, MessageSquare, Building2
 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -52,7 +52,10 @@ function preferencesKey(userId) {
 }
 
 function SettingsPage() {
-  const { user, isPro, updateProfile, changePassword, deleteAccount, logout, openBillingPortal } = useAuth()
+  const {
+    user, isPro, updateProfile, updatePreferences, exportMyData, changePassword, deleteAccount, logout, openBillingPortal,
+    requestEnableTwoFactor, confirmEnableTwoFactor, disableTwoFactor,
+  } = useAuth()
   const [portalLoading, setPortalLoading] = useState(false)
   const [portalError, setPortalError] = useState('')
 
@@ -235,6 +238,117 @@ function SettingsPage() {
       setPasswordError(err.message || 'Could not change your password.')
     } finally {
       setPasswordSaving(false)
+    }
+  }
+
+  // ----- Security: Two-Factor Authentication (email OTP) -----
+  const [twoFactorStep, setTwoFactorStep] = useState(null) // null | 'confirm' | 'disable'
+  const [twoFactorCode, setTwoFactorCode] = useState('')
+  const [twoFactorPassword, setTwoFactorPassword] = useState('')
+  const [twoFactorError, setTwoFactorError] = useState('')
+  const [twoFactorSaving, setTwoFactorSaving] = useState(false)
+  const [twoFactorSent, setTwoFactorSent] = useState(false)
+
+  const handleStartEnable2FA = async () => {
+    setTwoFactorError('')
+    setTwoFactorSaving(true)
+    try {
+      await requestEnableTwoFactor()
+      setTwoFactorStep('confirm')
+      setTwoFactorSent(true)
+      setTimeout(() => setTwoFactorSent(false), 4000)
+    } catch (err) {
+      setTwoFactorError(err.message || 'Could not send a confirmation code.')
+    } finally {
+      setTwoFactorSaving(false)
+    }
+  }
+
+  const handleConfirmEnable2FA = async () => {
+    setTwoFactorError('')
+    if (twoFactorCode.trim().length !== 6) {
+      setTwoFactorError('Enter the 6-digit code from your email.')
+      return
+    }
+    setTwoFactorSaving(true)
+    try {
+      await confirmEnableTwoFactor(twoFactorCode.trim())
+      setTwoFactorStep(null)
+      setTwoFactorCode('')
+    } catch (err) {
+      setTwoFactorError(err.message || 'Incorrect or expired code.')
+    } finally {
+      setTwoFactorSaving(false)
+    }
+  }
+
+  const handleDisable2FA = async () => {
+    setTwoFactorError('')
+    setTwoFactorSaving(true)
+    try {
+      await disableTwoFactor(twoFactorPassword)
+      setTwoFactorStep(null)
+      setTwoFactorPassword('')
+    } catch (err) {
+      setTwoFactorError(err.message || 'Could not turn off two-factor authentication.')
+    } finally {
+      setTwoFactorSaving(false)
+    }
+  }
+
+  // ----- Privacy: GDPR data export -----
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
+
+  const handleExportData = async () => {
+    setExportError('')
+    setExporting(true)
+    try {
+      await exportMyData()
+    } catch (err) {
+      setExportError(err.message || 'Could not prepare your data export. Please try again.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  // ----- Notifications: weekly report / exam reminders / re-engagement
+  // (server-synced — separate from the local-only toggles above) -----
+  const [weeklyReportOptIn, setWeeklyReportOptIn] = useState(false)
+  const [employerEmail, setEmployerEmail] = useState('')
+  const [examDate, setExamDate] = useState('')
+  const [reEngagementOptIn, setReEngagementOptIn] = useState(false)
+  // New feature: SMS text reminders + Employer company profile
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [smsRemindersEnabled, setSmsRemindersEnabled] = useState(false)
+  const [companyName, setCompanyName] = useState('')
+  const [remindersSaving, setRemindersSaving] = useState(false)
+  const [remindersSaved, setRemindersSaved] = useState(false)
+  const [remindersError, setRemindersError] = useState('')
+
+  useEffect(() => {
+    if (!user) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: syncs local form fields from the user object whenever it loads/changes
+    setWeeklyReportOptIn(!!user.weeklyReportOptIn)
+    setEmployerEmail(user.employerEmail || '')
+    setExamDate(user.examDate ? String(user.examDate).slice(0, 10) : '')
+    setReEngagementOptIn(!!user.reEngagementOptIn)
+    setPhoneNumber(user.phoneNumber || '')
+    setSmsRemindersEnabled(!!user.smsRemindersEnabled)
+    setCompanyName(user.companyName || '')
+  }, [user])
+
+  const handleSaveReminders = async () => {
+    setRemindersError('')
+    setRemindersSaving(true)
+    try {
+      await updatePreferences({ weeklyReportOptIn, employerEmail, examDate, reEngagementOptIn, phoneNumber, smsRemindersEnabled, companyName })
+      setRemindersSaved(true)
+      setTimeout(() => setRemindersSaved(false), 3000)
+    } catch (err) {
+      setRemindersError(err.message || 'Could not save your reminder preferences.')
+    } finally {
+      setRemindersSaving(false)
     }
   }
 
@@ -667,6 +781,135 @@ function SettingsPage() {
                 </div>
               )}
 
+              {/* New feature: Two-Factor Authentication (email OTP) */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck size={20} className="text-gray-600 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-gray-900">Two-Factor Authentication</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {user.twoFactorEnabled
+                            ? 'On — we\u2019ll email you a 6-digit code every time you sign in.'
+                            : 'Add an extra layer of security: a 6-digit code emailed to you at sign-in.'}
+                        </p>
+                      </div>
+                      {!twoFactorStep && (
+                        user.twoFactorEnabled ? (
+                          <button
+                            onClick={() => { setTwoFactorStep('disable'); setTwoFactorError('') }}
+                            className="shrink-0 px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition"
+                          >
+                            Turn off
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleStartEnable2FA}
+                            disabled={twoFactorSaving}
+                            className="shrink-0 flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition disabled:opacity-60"
+                          >
+                            {twoFactorSaving && <Loader2 size={14} className="animate-spin" />}
+                            Turn on
+                          </button>
+                        )
+                      )}
+                    </div>
+
+                    {twoFactorSent && !twoFactorStep && (
+                      <p className="text-green-600 text-xs mt-2">Confirmation code sent — check your email.</p>
+                    )}
+
+                    {twoFactorStep === 'confirm' && (
+                      <div className="mt-3 border border-gray-200 rounded-xl p-4 space-y-3 max-w-md">
+                        <p className="text-sm text-gray-700">Enter the 6-digit code we just emailed you to confirm.</p>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          placeholder="000000"
+                          value={twoFactorCode}
+                          onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ''))}
+                          className="w-full text-center tracking-[0.4em] text-xl font-semibold px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                        />
+                        {twoFactorError && <p className="text-red-600 text-xs">{twoFactorError}</p>}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleConfirmEnable2FA}
+                            disabled={twoFactorSaving}
+                            className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition disabled:opacity-60"
+                          >
+                            {twoFactorSaving && <Loader2 size={14} className="animate-spin" />}
+                            Confirm
+                          </button>
+                          <button
+                            onClick={() => { setTwoFactorStep(null); setTwoFactorCode(''); setTwoFactorError('') }}
+                            className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {twoFactorStep === 'disable' && (
+                      <div className="mt-3 border border-gray-200 rounded-xl p-4 space-y-3 max-w-md">
+                        {user.provider !== 'google' && (
+                          <input
+                            type="password"
+                            placeholder="Confirm your password"
+                            value={twoFactorPassword}
+                            onChange={(e) => setTwoFactorPassword(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500"
+                          />
+                        )}
+                        {twoFactorError && <p className="text-red-600 text-xs">{twoFactorError}</p>}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleDisable2FA}
+                            disabled={twoFactorSaving}
+                            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition disabled:opacity-60"
+                          >
+                            {twoFactorSaving && <Loader2 size={14} className="animate-spin" />}
+                            Yes, turn off
+                          </button>
+                          <button
+                            onClick={() => { setTwoFactorStep(null); setTwoFactorPassword(''); setTwoFactorError('') }}
+                            className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* New feature: GDPR self-service data export */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <Shield size={20} className="text-gray-600 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">Privacy &amp; Your Data</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Download a copy of everything ECSPrep holds about your account — your
+                      profile and your full activity history — as a JSON file, under UK GDPR's
+                      right to data portability.
+                    </p>
+                    {exportError && <p className="text-red-600 text-xs mt-2">{exportError}</p>}
+                    <button
+                      onClick={handleExportData}
+                      disabled={exporting}
+                      className="mt-3 flex items-center gap-2 text-gray-700 text-sm font-medium hover:text-gray-900 transition disabled:opacity-60"
+                    >
+                      {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                      {exporting ? 'Preparing your data…' : 'Download my data'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="bg-red-50 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <AlertCircle size={20} className="text-red-600 mt-0.5" />
@@ -840,6 +1083,164 @@ function SettingsPage() {
                     }`}
                   />
                 </button>
+              </div>
+
+              {/* New feature: Weekly progress email report */}
+              <div className="pt-2 border-t border-gray-100">
+                <div className="flex items-center justify-between py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      <RefreshCw size={20} className="text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Weekly Progress Report</p>
+                      <p className="text-sm text-gray-500">A weekly email summary of tests taken and your scores</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setWeeklyReportOptIn(!weeklyReportOptIn)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
+                      weeklyReportOptIn ? 'bg-blue-600' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 ${
+                        weeklyReportOptIn ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+                {weeklyReportOptIn && (
+                  <div className="pl-11 pb-3">
+                    <label className="text-xs font-medium text-gray-500">
+                      Optional — also CC your employer or training coordinator
+                    </label>
+                    <input
+                      type="email"
+                      value={employerEmail}
+                      onChange={(e) => setEmployerEmail(e.target.value)}
+                      placeholder="employer@company.co.uk"
+                      className="mt-1 w-full max-w-sm px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* New feature: Exam-day reminder emails */}
+              <div className="pt-2 border-t border-gray-100">
+                <div className="flex items-center gap-3 py-3">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <CalendarClock size={20} className="text-gray-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">Exam Day Reminders</p>
+                    <p className="text-sm text-gray-500">Set your booked ECS test date to get reminder emails at 7, 3 and 1 day(s) before</p>
+                  </div>
+                </div>
+                <div className="pl-11 pb-3">
+                  <input
+                    type="date"
+                    value={examDate}
+                    onChange={(e) => setExamDate(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* New feature: SMS text reminders (Twilio) */}
+              <div className="pt-2 border-t border-gray-100">
+                <div className="flex items-center justify-between py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      <MessageSquare size={20} className="text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">SMS Text Reminders</p>
+                      <p className="text-sm text-gray-500">Get your exam-day reminders by text as well as email — handy on site with no signal for emails.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSmsRemindersEnabled(!smsRemindersEnabled)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 shrink-0 ${
+                      smsRemindersEnabled ? 'bg-blue-600' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 ${
+                        smsRemindersEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="pl-11 pb-1">
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="07123 456789"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 max-w-xs"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">UK mobile numbers only.</p>
+                </div>
+              </div>
+
+              {/* New feature: re-engagement nudge */}
+              <div className="flex items-center justify-between py-3 border-t border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Clock size={20} className="text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">"Keep Your Momentum" Nudges</p>
+                    <p className="text-sm text-gray-500">A gentle reminder email if you haven't practised in a few days</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setReEngagementOptIn(!reEngagementOptIn)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
+                    reEngagementOptIn ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 ${
+                      reEngagementOptIn ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* New feature: Employer company profile — used on the Team
+                  Dashboard and as the letterhead on the Compliance Audit
+                  Report. Only relevant to employers, but harmless to show
+                  everyone since it's just an optional field. */}
+              <div className="flex items-center gap-3 py-3 border-t border-gray-100">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <Building2 size={20} className="text-gray-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">Company Name</p>
+                  <p className="text-sm text-gray-500 mb-2">Shown on your Team Dashboard and Compliance Audit Report, if you manage a team.</p>
+                  <input
+                    type="text"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="Your company name"
+                    className="w-full max-w-sm px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  onClick={handleSaveReminders}
+                  disabled={remindersSaving}
+                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-60"
+                >
+                  {remindersSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  Save Reminder Preferences
+                </button>
+                {remindersSaved && <span className="text-emerald-600 text-sm flex items-center gap-1"><CheckCircle size={14} /> Saved</span>}
+                {remindersError && <span className="text-red-600 text-sm">{remindersError}</span>}
               </div>
             </div>
           )}

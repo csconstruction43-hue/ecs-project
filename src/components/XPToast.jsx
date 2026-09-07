@@ -5,7 +5,8 @@
 // finishes, and shows a small toast: XP earned, level-up, and any newly
 // unlocked badges. Fully decoupled from every individual test page.
 import React, { useEffect, useState } from 'react'
-import { Sparkles, Trophy, Flame } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Sparkles, Trophy, Flame, Zap, Gift, CalendarCheck } from 'lucide-react'
 
 export default function XPToast() {
   const [toast, setToast] = useState(null)
@@ -13,10 +14,21 @@ export default function XPToast() {
 
   useEffect(() => {
     function handle(e) {
-      const { xpEarned, leveledUp, newLevel, newBadges, streak } = e.detail || {}
+      const { xpEarned, leveledUp, newLevel, newBadges, streak, comboBonus, bestCombo, challengeReady, source, coinsEarned } = e.detail || {}
       if (!xpEarned) return
       setLeaving(false)
-      setToast({ xpEarned, leveledUp, newLevel, newBadges: newBadges || [], streak })
+      setToast({
+        xpEarned,
+        leveledUp,
+        newLevel,
+        newBadges: newBadges || [],
+        streak,
+        comboBonus: comboBonus || 0,
+        bestCombo: bestCombo || 0,
+        challengeReady: !!challengeReady,
+        source: source || 'test',
+        coinsEarned: coinsEarned || 0,
+      })
     }
     window.addEventListener('gamification:update', handle)
     return () => window.removeEventListener('gamification:update', handle)
@@ -42,10 +54,14 @@ export default function XPToast() {
     >
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shrink-0">
-          <Sparkles size={18} />
+          {toast.source === 'daily_login' ? <CalendarCheck size={18} /> : <Sparkles size={18} />}
         </div>
         <div className="min-w-0">
-          <div className="font-bold text-gray-900 dark:text-slate-100 text-sm">+{toast.xpEarned} XP earned!</div>
+          <div className="font-bold text-gray-900 dark:text-slate-100 text-sm">
+            {toast.source === 'daily_login'
+              ? `Daily login bonus: +${toast.xpEarned} XP${toast.coinsEarned ? ` & +${toast.coinsEarned} coins` : ''}`
+              : `+${toast.xpEarned} XP earned!`}
+          </div>
           {toast.streak > 1 && (
             <div className="text-xs text-blue-500 flex items-center gap-1 mt-0.5">
               <Flame size={12} /> {toast.streak}-day streak
@@ -60,11 +76,26 @@ export default function XPToast() {
         </div>
       )}
 
+      {toast.comboBonus > 0 && (
+        <div className="mt-2 flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 text-xs font-semibold text-amber-700 dark:text-amber-400">
+          <Zap size={14} /> {toast.bestCombo}-answer combo! +{toast.comboBonus} bonus XP
+        </div>
+      )}
+
       {toast.newBadges.map((b) => (
         <div key={b.id} className="mt-2 flex items-center gap-2 bg-slate-50 dark:bg-slate-900/20 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-400">
           <span className="text-base">{b.icon}</span> Badge unlocked: {b.name}
         </div>
       ))}
+
+      {toast.challengeReady && (
+        <Link
+          to="/achievements"
+          className="mt-2 flex items-center gap-2 bg-green-50 dark:bg-green-900/20 rounded-lg px-3 py-2 text-xs font-semibold text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+        >
+          <Gift size={14} /> Daily Challenge complete — tap to claim your reward!
+        </Link>
+      )}
     </div>
   )
 }

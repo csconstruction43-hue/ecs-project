@@ -1,11 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Seo, { faqSchema, breadcrumbSchema, articleSchema } from '../components/Seo'
-import { blogPosts, getPostBySlug } from '../data/blogPosts'
+import BlogProUpsell from '../components/BlogProUpsell'
+import BlogCardBookingUpsell from '../components/BlogCardBookingUpsell'
+import BlogTestBookingUpsell from '../components/BlogTestBookingUpsell'
+import PageLoader from '../components/PageLoader'
+import { fetchBlogMeta, mergeSortedBlogPosts, findMergedPostBySlug, getMergedRelatedPosts } from '../lib/blogStore'
 
 function BlogPostPage() {
   const { slug } = useParams()
-  const post = getPostBySlug(slug)
+  const [meta, setMeta] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchBlogMeta().then((m) => { if (!cancelled) setMeta(m) })
+    return () => { cancelled = true }
+  }, [])
+
+  if (!meta) return <PageLoader />
+
+  const post = findMergedPostBySlug(slug, meta)
 
   if (!post) {
     return (
@@ -36,9 +50,11 @@ function BlogPostPage() {
     jsonLd.push(faqSchema(post.faqs))
   }
 
-  // Related posts: up to 3 other posts, for internal linking (helps both
-  // users and crawlers discover more content from each article).
-  const related = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3)
+  // Related posts: up to 3 other posts, prioritising shared tags, for
+  // internal linking (helps both users and crawlers discover more content
+  // from each article).
+  const allPosts = mergeSortedBlogPosts(meta)
+  const related = getMergedRelatedPosts(post, allPosts, 3)
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-3xl">
@@ -72,6 +88,10 @@ function BlogPostPage() {
           <Link to="/mock-test" className="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">Start Free Mock Test →</Link>
         </div>
       </article>
+
+      <BlogProUpsell />
+      <BlogCardBookingUpsell />
+      <BlogTestBookingUpsell />
 
       {related.length > 0 && (
         <div className="mt-12">

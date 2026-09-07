@@ -43,7 +43,7 @@ function VideoModal({ video, onClose }) {
             Opens a curated YouTube search for this topic in a new tab.
           </p>
         </div>
-        <button onClick={onClose} className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400"><X size={18} /></button>
+        <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400"><X size={18} /></button>
       </div>
     </div>
   )

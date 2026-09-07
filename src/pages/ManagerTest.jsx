@@ -176,7 +176,7 @@ function ManagerTest() {
   }, [testCompleted])
 
   if (!canAccessTest('/ecs-managers-and-professionals-test', isPro)) {
-    return <LockedTestScreen testName="ECS Managers & Professionals Test" />
+    return <LockedTestScreen testName="ECS Managers & Professionals Test" previewQuestions={questions.slice(0, 3)} testStats={{ totalQuestions: questions.length, passMark: 0.86, duration: 1800 }} />
   }
 
   if (testCompleted) {
@@ -294,7 +294,7 @@ function ManagerTest() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-slate-700 mb-4">
                   <div className="flex items-center gap-2">✓ Unlimited 50-question tests</div>
                   <div className="flex items-center gap-2">✓ AI-powered explanations</div>
-                  <div className="flex items-center gap-2">✓ All 11 ECS topics</div>
+                  <div className="flex items-center gap-2">✓ All 11 HSE topics</div>
                   <div className="flex items-center gap-2">✓ Analytics dashboard & pass probability</div>
                   <div className="flex items-center gap-2">✓ Practice by topic</div>
                   <div className="flex items-center gap-2">✓ Progress tracking & My Mistakes</div>

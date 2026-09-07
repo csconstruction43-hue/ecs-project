@@ -41,9 +41,9 @@ This is what powers the 14-language AI translation. No credit card needed.
    | Variable | Value |
    |---|---|
    | `CLIENT_URL` | leave blank for now, you'll fill this after Step 4 |
-   | `ADMIN_EMAILS` | `csconstruction43@gmail.com` |
-   | `ADMIN_SEED_EMAIL` | `csconstruction43@gmail.com` |
-   | `ADMIN_SEED_PASSWORD` | `Revision@2026` |
+   | `ADMIN_EMAILS` | your-real-email@example.com |
+   | `ADMIN_SEED_EMAIL` | your-real-email@example.com |
+   | `ADMIN_SEED_PASSWORD` | pick a strong, unique password here — do not reuse an old one |
    | `GEMINI_API_KEY` | the key from Step 1 |
    | `STRIPE_SECRET_KEY`, `STRIPE_PRICE_*`, `STRIPE_WEBHOOK_SECRET` | only if you use payments — otherwise leave blank |
    | `GOOGLE_CLIENT_ID` | only if you use Google Sign-In — otherwise leave blank |

@@ -230,7 +230,8 @@ export default function AdminRams() {
             </div>
           ) : (
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden no-print">
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-sm">
                 <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
                   <tr>
                     <th className="text-left px-5 py-3 font-semibold">RAMS No.</th>
@@ -271,6 +272,7 @@ export default function AdminRams() {
                   })}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </>

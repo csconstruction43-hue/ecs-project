@@ -30,7 +30,7 @@ function NewThreadModal({ onClose, onCreate }) {
       <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold text-lg text-gray-900 dark:text-slate-100">Start a New Thread</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"><X size={18} /></button>
+          <button onClick={onClose} aria-label="Close" className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"><X size={18} /></button>
         </div>
         <div className="space-y-3">
           <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 text-sm">

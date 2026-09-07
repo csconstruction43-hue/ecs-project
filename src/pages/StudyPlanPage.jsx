@@ -5,10 +5,12 @@
 // get the full schedule built from their actual weakest topics.
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CalendarDays, Target, CheckCircle2, Circle, Sparkles, RotateCcw } from 'lucide-react'
+import { CalendarDays, Target, CheckCircle2, Circle, Sparkles, RotateCcw, PartyPopper, CalendarPlus } from 'lucide-react'
 import Seo from '../components/Seo'
 import ProGate from '../components/ProGate'
 import { useAuth } from '../context/AuthContext'
+import { getUkBankHolidays, nextBankHoliday } from '../lib/ukBankHolidays'
+import { buildExamICS, downloadICS } from '../lib/icsGenerator'
 
 const EXAM_DATE_KEY = 'studyPlanExamDate'
 const PROGRESS_KEY = 'studyPlanProgress'
@@ -48,7 +50,18 @@ function weakestTopics() {
     .map(([topic]) => topic)
 }
 
-function buildPlan(daysLeft, topics) {
+function addDaysToDateStr(dateStr, days) {
+  const d = new Date(dateStr + 'T00:00:00')
+  d.setDate(d.getDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+
+// `holidayDates` is a Set of YYYY-MM-DD strings (UK bank holidays). Days
+// that land on a bank holiday become a lighter "bank holiday" entry
+// instead of a mock/topic day, on the assumption most candidates won't be
+// doing focused revision on a day off — this keeps the plan realistic
+// instead of quietly expecting a full session on Christmas Day.
+function buildPlan(daysLeft, topics, todayStr, holidayDates = new Set()) {
   const plan = []
   if (daysLeft <= 0) return plan
   const pool = topics.length > 0 ? topics : GENERIC_TOPICS
@@ -56,15 +69,20 @@ function buildPlan(daysLeft, topics) {
 
   for (let day = 1; day <= daysLeft; day++) {
     const isLastDay = day === daysLeft
-    const isMockDay = !isLastDay && day % 3 === 0
+    const calendarDate = todayStr ? addDaysToDateStr(todayStr, day - 1) : null
+    const isHoliday = calendarDate ? holidayDates.has(calendarDate) : false
+    const isMockDay = !isLastDay && !isHoliday && day % 3 === 0
+
     if (isLastDay) {
-      plan.push({ day, kind: 'rest', title: 'Light review only', detail: 'Skim your weak topics, get an early night. Don\u2019t cram new material the day before your test.' })
+      plan.push({ day, date: calendarDate, kind: 'rest', title: 'Light review only', detail: 'Skim your weak topics, get an early night. Don\u2019t cram new material the day before your test.' })
+    } else if (isHoliday) {
+      plan.push({ day, date: calendarDate, kind: 'holiday', title: 'UK bank holiday — light day', detail: 'Take the day off from a full session. 10–15 minutes of flashcards is plenty if you want to keep the streak going.' })
     } else if (isMockDay) {
-      plan.push({ day, kind: 'mock', title: 'Full timed mock test', detail: 'Simulate exam conditions — full length, no pausing, no notes.' })
+      plan.push({ day, date: calendarDate, kind: 'mock', title: 'Full timed mock test', detail: 'Simulate exam conditions — full length, no pausing, no notes.' })
     } else {
       const topic = pool[topicIdx % pool.length]
       topicIdx += 1
-      plan.push({ day, kind: 'topic', title: `Focus topic: ${topic}`, detail: 'Practice by topic, then review any questions you get wrong straight away.' })
+      plan.push({ day, date: calendarDate, kind: 'topic', title: `Focus topic: ${topic}`, detail: 'Practice by topic, then review any questions you get wrong straight away.' })
     }
   }
   return plan
@@ -83,6 +101,7 @@ function StudyPlanPage() {
   const { isPro } = useAuth()
   const [examDate, setExamDate] = useState(() => loadJSON(EXAM_DATE_KEY, ''))
   const [progress, setProgress] = useState(() => loadJSON(PROGRESS_KEY, {}))
+  const [bankHolidays, setBankHolidays] = useState([])
 
   useEffect(() => {
     try { localStorage.setItem(EXAM_DATE_KEY, JSON.stringify(examDate)) } catch { /* ignore */ }
@@ -92,9 +111,32 @@ function StudyPlanPage() {
     try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)) } catch { /* ignore */ }
   }, [progress])
 
+  useEffect(() => {
+    let cancelled = false
+    getUkBankHolidays().then((events) => {
+      if (!cancelled) setBankHolidays(events)
+    })
+    return () => { cancelled = true }
+  }, [])
+
+  const holidayDates = useMemo(() => new Set(bankHolidays.map((h) => h.date)), [bankHolidays])
+  const upcomingHoliday = useMemo(() => nextBankHoliday(bankHolidays), [bankHolidays])
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const daysLeft = useMemo(() => daysBetween(examDate), [examDate])
   const topics = useMemo(() => weakestTopics(), [])
-  const plan = useMemo(() => (daysLeft ? buildPlan(daysLeft, topics) : []), [daysLeft, topics])
+  const plan = useMemo(
+    () => (daysLeft ? buildPlan(daysLeft, topics, todayStr, holidayDates) : []),
+    [daysLeft, topics, todayStr, holidayDates]
+  )
+
+  const addExamToCalendar = () => {
+    const ics = buildExamICS({
+      dateStr: examDate,
+      title: 'ECS Health & Safety Test',
+      description: 'Bring photo ID and your booking confirmation. Arrive at least 15 minutes early. Booked/tracked via ECSPrep.',
+    })
+    downloadICS(`ecs-test-${examDate}`, ics)
+  }
 
   const toggleDay = (day) => {
     setProgress((prev) => ({ ...prev, [day]: !prev[day] }))
@@ -145,6 +187,15 @@ function StudyPlanPage() {
           />
           {examDate && (
             <button
+              onClick={addExamToCalendar}
+              className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800"
+              title="Download a calendar reminder for your exam day"
+            >
+              <CalendarPlus size={16} /> Add to Calendar
+            </button>
+          )}
+          {examDate && (
+            <button
               onClick={resetPlan}
               className="text-gray-400 hover:text-gray-600 flex items-center gap-1 text-sm"
               title="Reset plan"
@@ -154,6 +205,14 @@ function StudyPlanPage() {
           )}
         </div>
       </div>
+
+      {upcomingHoliday && (
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-8 justify-center">
+          <PartyPopper size={14} className="text-amber-500" />
+          Next UK bank holiday: <span className="font-medium text-gray-600">{upcomingHoliday.title}</span>,{' '}
+          {new Date(upcomingHoliday.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </div>
+      )}
 
       {!examDate && (
         <div className="text-center text-gray-400 py-12 border border-dashed border-gray-200 rounded-2xl">

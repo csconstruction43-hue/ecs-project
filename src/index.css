@@ -383,3 +383,52 @@ html.readable-mode span {
   line-height: 1.75 !important;
 }
 
+/* Mobile-responsive tables inside long-form (blog / dynamic page) HTML
+   content. This content is raw HTML from blogPosts.js / the admin Pages
+   CMS, so individual <table> elements can't be wrapped with a div in JSX —
+   this makes every one of them horizontally scrollable on narrow screens
+   instead of overflowing the page or squashing unreadably. */
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* High contrast mode — Accessibility Toolbar. Boosts text/background
+   contrast site-wide (WCAG 2.2 AA target) without needing a whole separate
+   theme. Kept simple and !important-heavy on purpose: this must win over
+   every component's own inline/utility colours. */
+html.high-contrast body {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+html.high-contrast.dark body {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+html.high-contrast * {
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+html.high-contrast a,
+html.high-contrast button {
+  text-decoration: underline;
+}
+html.high-contrast img,
+html.high-contrast svg {
+  filter: contrast(1.15);
+}
+
+/* Reduce motion — Accessibility Toolbar. Also honoured automatically on
+   first visit for anyone with the OS-level "prefers reduced motion"
+   setting on (see ThemeContext.jsx). */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}

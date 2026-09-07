@@ -6,7 +6,9 @@ import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { LanguageProvider } from './context/LanguageContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { PracticeStyleProvider } from './context/PracticeStyleContext.jsx'
 import './index.css'  // Make sure this line exists
+import './styles/practiceStyles.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -14,7 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <LanguageProvider>
           <AuthProvider>
-            <App />
+            <PracticeStyleProvider>
+              <App />
+            </PracticeStyleProvider>
           </AuthProvider>
         </LanguageProvider>
       </ThemeProvider>

@@ -208,8 +208,8 @@ export default function AdminInvoices() {
               <p className="text-gray-400 text-sm mt-1">Create your first invoice to get started.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden no-print">
-              <table className="w-full text-sm">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto no-print">
+              <table className="w-full min-w-[720px] text-sm">
                 <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
                   <tr>
                     <th className="text-left px-5 py-3 font-semibold">Invoice</th>
@@ -331,7 +331,7 @@ export default function AdminInvoices() {
 
             {/* Live preview / printable invoice */}
             <div className="lg:col-span-2">
-              <div className="invoice-print-area bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
+              <div className="invoice-print-area bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-8">
                 <div className="flex items-start justify-between mb-8">
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">{form.from.name || 'Your Business'}</h2>
@@ -356,7 +356,8 @@ export default function AdminInvoices() {
                   {form.client.address && <p className="text-sm text-gray-500 whitespace-pre-line">{form.client.address}</p>}
                 </div>
 
-                <table className="w-full text-sm mb-4">
+                <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                <table className="w-full min-w-[480px] text-sm mb-4">
                   <thead>
                     <tr className="border-b-2 border-gray-200 text-gray-500 text-xs uppercase tracking-wide">
                       <th className="text-left py-2 font-semibold">Description</th>
@@ -401,6 +402,7 @@ export default function AdminInvoices() {
                     ))}
                   </tbody>
                 </table>
+                </div>
 
                 <button onClick={addItem} className="no-print flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 mb-6">
                   <Plus size={14} /> Add line item

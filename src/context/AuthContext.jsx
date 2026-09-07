@@ -4,11 +4,15 @@
 // token is a JWT stored in localStorage; the user object is cached there
 // too so the UI has something to show before /api/auth/me resolves.
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { apiRequest, getToken, setToken } from '../lib/api'
+import { apiRequest, apiRequestBlob, getToken, setToken } from '../lib/api'
 
 const AuthContext = createContext(null)
 const USER_CACHE_KEY = 'ecsprep_user'
 const PENDING_REF_KEY = 'ecsprep_pending_ref'
+// New feature: user impersonation. Stashes the admin's own {token, user}
+// here while viewing the app as someone else, so "Return to admin" is an
+// instant local swap — no extra API round-trip needed.
+const IMPERSONATOR_KEY = 'ecsprep_impersonator'
 
 // Captures ?ref=CODE from the URL (e.g. a shared referral link) so it's
 // still available at signup time even if the person browses a few pages
@@ -91,9 +95,33 @@ export function AuthProvider({ children }) {
   const login = useCallback(async ({ email, password }) => {
     setLoading(true)
     try {
-      const { token, user: loggedInUser } = await apiRequest('/api/auth/login', {
+      const result = await apiRequest('/api/auth/login', {
         method: 'POST',
         body: { email, password },
+        auth: false,
+      })
+      // New feature: Two-Factor Authentication. If the account has 2FA
+      // turned on, the server holds the real session back and instead
+      // returns a short-lived pendingToken — the caller (LoginPage) shows
+      // an "enter your code" step and calls verifyTwoFactorLogin below.
+      if (result.requires2FA) return { requires2FA: true, pendingToken: result.pendingToken }
+      const { token, user: loggedInUser } = result
+      setToken(token)
+      persistUser(loggedInUser)
+      return loggedInUser
+    } finally {
+      setLoading(false)
+    }
+  }, [persistUser])
+
+  // New feature: Two-Factor Authentication — completes a login that was put
+  // on hold by login() above, once the person enters the emailed code.
+  const verifyTwoFactorLogin = useCallback(async ({ pendingToken, code }) => {
+    setLoading(true)
+    try {
+      const { token, user: loggedInUser } = await apiRequest('/api/auth/2fa/verify', {
+        method: 'POST',
+        body: { pendingToken, code },
         auth: false,
       })
       setToken(token)
@@ -101,6 +129,58 @@ export function AuthProvider({ children }) {
       return loggedInUser
     } finally {
       setLoading(false)
+    }
+  }, [persistUser])
+
+  const resendTwoFactorCode = useCallback(async (pendingToken) => {
+    await apiRequest('/api/auth/2fa/resend', { method: 'POST', body: { pendingToken }, auth: false })
+  }, [])
+
+  // New feature: Two-Factor Authentication — Settings > Security toggle.
+  const requestEnableTwoFactor = useCallback(async () => {
+    await apiRequest('/api/user/2fa/request-enable', { method: 'POST' })
+  }, [])
+
+  const confirmEnableTwoFactor = useCallback(async (code) => {
+    const { user: updatedUser } = await apiRequest('/api/user/2fa/confirm-enable', { method: 'POST', body: { code } })
+    persistUser(updatedUser)
+    return updatedUser
+  }, [persistUser])
+
+  const disableTwoFactor = useCallback(async (password) => {
+    const { user: updatedUser } = await apiRequest('/api/user/2fa/disable', { method: 'POST', body: { password } })
+    persistUser(updatedUser)
+    return updatedUser
+  }, [persistUser])
+
+  // New feature: user impersonation ("log in as this user") for admin
+  // support debugging — see startImpersonation.
+  const startImpersonation = useCallback(async (targetUserId) => {
+    const { token: impersonationToken, user: targetUser } = await apiRequest(`/api/admin/users/${targetUserId}/impersonate`, { method: 'POST' })
+    try {
+      localStorage.setItem(IMPERSONATOR_KEY, JSON.stringify({ token: getToken(), user }))
+    } catch {
+      // ignore storage errors — worst case "Return to admin" won't be available
+    }
+    setToken(impersonationToken)
+    persistUser(targetUser)
+    return targetUser
+  }, [user, persistUser])
+
+  const isImpersonating = useCallback(() => {
+    try { return !!localStorage.getItem(IMPERSONATOR_KEY) } catch { return false }
+  }, [])
+
+  const stopImpersonation = useCallback(() => {
+    try {
+      const raw = localStorage.getItem(IMPERSONATOR_KEY)
+      if (!raw) return
+      const { token: adminToken, user: adminUser } = JSON.parse(raw)
+      setToken(adminToken)
+      persistUser(adminUser)
+      localStorage.removeItem(IMPERSONATOR_KEY)
+    } catch {
+      // ignore — worst case the person just has to log back in manually
     }
   }, [persistUser])
 
@@ -152,6 +232,33 @@ export function AuthProvider({ children }) {
     return updatedUser
   }, [persistUser])
 
+  // New feature: notification/reminder preferences (weekly report opt-in,
+  // employer email, exam date, re-engagement nudge) — kept separate from
+  // updateProfile above since these drive the backend's scheduled emails
+  // rather than the profile card.
+  const updatePreferences = useCallback(async (patch) => {
+    const { user: updatedUser } = await apiRequest('/api/user/preferences', {
+      method: 'PATCH',
+      body: patch,
+    })
+    persistUser(updatedUser)
+    return updatedUser
+  }, [persistUser])
+
+  // New feature: GDPR self-service "download my data" — triggers a browser
+  // download of everything ECSPrep holds on this account, no admin needed.
+  const exportMyData = useCallback(async () => {
+    const blob = await apiRequestBlob('/api/user/export')
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'my-ecsprep-data.json'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }, [])
+
   const changePassword = useCallback(async ({ currentPassword, newPassword }) => {
     await apiRequest('/api/user/change-password', {
       method: 'POST',
@@ -170,10 +277,10 @@ export function AuthProvider({ children }) {
 
   // Starts real Stripe Checkout. Redirects the browser to Stripe's hosted
   // payment page — no card details ever touch our own frontend/backend.
-  const startCheckout = useCallback(async (planId) => {
+  const startCheckout = useCallback(async (planId, couponCode) => {
     const { url } = await apiRequest('/api/stripe/create-checkout-session', {
       method: 'POST',
-      body: { plan: planId },
+      body: { plan: planId, coupon: couponCode || undefined },
     })
     window.location.href = url
   }, [])
@@ -222,16 +329,32 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
+    // New feature: granular admin roles. isAdmin now means "can enter the
+    // /admin area at all" (any staff role), matching the backend's
+    // STAFF_ROLES / requireAdmin. isSuperAdmin is the strict, full-access
+    // check — used to gate the sensitive sections client-side too (backend
+    // still enforces this regardless via requireSuperAdmin).
+    isAdmin: ['admin', 'support_agent', 'content_editor'].includes(user?.role),
+    isSuperAdmin: user?.role === 'admin',
     isPro: !!user?.isPro,
     loading,
     login,
+    verifyTwoFactorLogin,
+    resendTwoFactorCode,
+    requestEnableTwoFactor,
+    confirmEnableTwoFactor,
+    disableTwoFactor,
     signup,
     loginWithGoogle,
     logout,
     updateProfile,
+    updatePreferences,
+    exportMyData,
     changePassword,
     deleteAccount,
+    startImpersonation,
+    isImpersonating,
+    stopImpersonation,
     startCheckout,
     openBillingPortal,
     confirmCheckoutSession,
@@ -242,6 +365,7 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext)
   if (!ctx) {

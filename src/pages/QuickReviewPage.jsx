@@ -12,7 +12,7 @@ import Seo from '../components/Seo'
 export default function QuickReviewPage() {
   const [openTopic, setOpenTopic] = useState(null)
   const [search, setSearch] = useState('')
-  const allQuestions = useMemo(getAllQuestions, [])
+  const allQuestions = useMemo(() => getAllQuestions(), [])
 
   const notesByTopic = useMemo(() => {
     return dashboardTopics.map((t) => {

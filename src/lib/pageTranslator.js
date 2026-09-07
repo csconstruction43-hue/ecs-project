@@ -94,7 +94,6 @@ function collectTextNodes(root) {
   })
   const nodes = []
   let current
-  // eslint-disable-next-line no-cond-assign
   while ((current = walker.nextNode())) nodes.push(current)
   return nodes
 }
