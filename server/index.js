@@ -2811,10 +2811,23 @@ app.post('/api/book-card', contactLimiter, bookingFileFields, async (req, res) =
     try { submitterUserId = jwt.verify(authHeader.slice(7), JWT_SECRET).sub } catch { /* guest checkout is fine */ }
   }
   const applicationId = `capp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  // Store every field the candidate filled in (previously only a handful of
+  // summary fields were saved, so the admin panel could never show the full
+  // submission). Documents are kept as base64 data URIs in the row itself
+  // (same files already emailed as attachments above) so admin can preview
+  // or download the passport photo / ID proof / HS&E proof from the panel.
+  const toDataUri = (f) => (f ? { filename: f.originalname, contentType: f.mimetype, dataUri: `data:${f.mimetype};base64,${f.buffer.toString('base64')}` } : null)
   await createCardApplication({
     id: applicationId,
     userId: submitterUserId,
     fullName, email, phone, cardType, applicationType, jobTitle, employer,
+    dob, niNumber, gender, streetAddress, townCity, postcode,
+    previousCardNumber, previousExpiryDate, qualification, hasPassedTest, notes,
+    documents: {
+      passportPhoto: toDataUri(passportPhoto),
+      idProof: toDataUri(idProof),
+      hseProof: toDataUri(files.hseProof?.[0]),
+    },
     stage: 'submitted',
     stageHistory: [{ stage: 'submitted', at: new Date().toISOString(), note: '' }],
   })

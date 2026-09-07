@@ -5,7 +5,7 @@
 // nothing was tracked. Moving a candidate through a stage here emails them
 // an update automatically (see PATCH /api/admin/card-applications/:id).
 import React, { useEffect, useState } from 'react'
-import { CreditCard, Loader2, Mail, Phone } from 'lucide-react'
+import { CreditCard, Loader2, Mail, Phone, Eye, X, FileText, Download } from 'lucide-react'
 import { apiRequest } from '../../lib/api'
 
 const STAGES = [
@@ -33,6 +33,7 @@ const AdminCardApplications = () => {
   const [selectedId, setSelectedId] = useState(null)
   const [noteDraft, setNoteDraft] = useState('')
   const [saving, setSaving] = useState(false)
+  const [viewFullId, setViewFullId] = useState(null)
 
   const load = async () => {
     setLoading(true)
@@ -50,6 +51,7 @@ const AdminCardApplications = () => {
   useEffect(() => { load() }, [])
 
   const selected = applications.find((a) => a.id === selectedId) || null
+  const viewFullApp = applications.find((a) => a.id === viewFullId) || null
 
   const visible = applications.filter((a) => filter === 'all' || a.stage === filter)
   const pendingCount = applications.filter((a) => a.stage === 'submitted').length
@@ -133,15 +135,25 @@ const AdminCardApplications = () => {
             ) : (
               <div>
                 <div className="mb-4">
-                  <p className="font-semibold text-gray-900 text-lg">{selected.fullName}</p>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-500">
-                    <a href={`mailto:${selected.email}`} className="flex items-center gap-1 text-blue-600"><Mail size={13} /> {selected.email}</a>
-                    {selected.phone && <span className="flex items-center gap-1"><Phone size={13} /> {selected.phone}</span>}
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-gray-900 text-lg">{selected.fullName}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-500">
+                        <a href={`mailto:${selected.email}`} className="flex items-center gap-1 text-blue-600"><Mail size={13} /> {selected.email}</a>
+                        {selected.phone && <span className="flex items-center gap-1"><Phone size={13} /> {selected.phone}</span>}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {selected.cardType} · {selected.applicationType} · {selected.jobTitle}
+                        {selected.employer ? ` at ${selected.employer}` : ''}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setViewFullId(selected.id)}
+                      className="shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-purple-200 text-purple-700 bg-purple-50 hover:bg-purple-100 transition"
+                    >
+                      <Eye size={14} /> View Full Details
+                    </button>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {selected.cardType} · {selected.applicationType} · {selected.jobTitle}
-                    {selected.employer ? ` at ${selected.employer}` : ''}
-                  </p>
                 </div>
 
                 <div className="mb-5">
@@ -188,7 +200,121 @@ const AdminCardApplications = () => {
           </div>
         </div>
       )}
+
+      {/* Full application detail modal — shows every field the candidate
+          filled in on the booking form, plus their uploaded documents,
+          not just the summary shown in the list/detail panel above. */}
+      {viewFullApp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={() => setViewFullId(null)}>
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900">Full Application — {viewFullApp.fullName}</h2>
+              <button onClick={() => setViewFullId(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <Section title="Personal details">
+                <DetailRow label="Full name" value={viewFullApp.fullName} />
+                <DetailRow label="Date of birth" value={viewFullApp.dob} />
+                <DetailRow label="NI number" value={viewFullApp.niNumber} />
+                <DetailRow label="Gender" value={viewFullApp.gender} />
+              </Section>
+
+              <Section title="Contact & address">
+                <DetailRow label="Email" value={viewFullApp.email} />
+                <DetailRow label="Mobile" value={viewFullApp.phone} />
+                <DetailRow label="Street address" value={viewFullApp.streetAddress} />
+                <DetailRow label="Town / City" value={viewFullApp.townCity} />
+                <DetailRow label="Postcode" value={viewFullApp.postcode} />
+              </Section>
+
+              <Section title="Application">
+                <DetailRow label="Application type" value={viewFullApp.applicationType} />
+                {viewFullApp.applicationType === 'Renewal' && (
+                  <>
+                    <DetailRow label="Previous card number" value={viewFullApp.previousCardNumber} />
+                    <DetailRow label="Previous expiry date" value={viewFullApp.previousExpiryDate} />
+                  </>
+                )}
+                <DetailRow label="Card type" value={viewFullApp.cardType} />
+                <DetailRow label="Job title / occupation" value={viewFullApp.jobTitle} />
+                <DetailRow label="Employer" value={viewFullApp.employer} />
+                <DetailRow label="Qualification" value={viewFullApp.qualification} />
+                <DetailRow label="Passed H&S/HS&E test?" value={viewFullApp.hasPassedTest} />
+              </Section>
+
+              {viewFullApp.notes && (
+                <Section title="Notes from candidate">
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{viewFullApp.notes}</p>
+                </Section>
+              )}
+
+              <Section title="Uploaded documents">
+                <div className="grid sm:grid-cols-3 gap-3">
+                  <DocumentTile label="Passport photo" doc={viewFullApp.documents?.passportPhoto} />
+                  <DocumentTile label="Identity proof" doc={viewFullApp.documents?.idProof} />
+                  <DocumentTile label="H&S/HS&E proof" doc={viewFullApp.documents?.hseProof} />
+                </div>
+              </Section>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  )
+}
+
+function Section({ title, children }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{title}</p>
+      <div className="space-y-1.5">{children}</div>
+    </div>
+  )
+}
+
+function DetailRow({ label, value }) {
+  if (!value) return null
+  return (
+    <div className="flex flex-wrap gap-x-2 text-sm">
+      <span className="text-gray-500 min-w-[160px]">{label}</span>
+      <span className="text-gray-900 font-medium">{value}</span>
+    </div>
+  )
+}
+
+function DocumentTile({ label, doc }) {
+  if (!doc?.dataUri) {
+    return (
+      <div className="border border-dashed border-gray-200 rounded-xl p-3 text-center">
+        <FileText size={20} className="mx-auto text-gray-300 mb-1" />
+        <p className="text-[11px] text-gray-400">{label}</p>
+        <p className="text-[10px] text-gray-300">Not provided</p>
+      </div>
+    )
+  }
+  const isImage = doc.contentType?.startsWith('image/')
+  return (
+    <a
+      href={doc.dataUri}
+      download={doc.filename}
+      className="block border border-gray-200 rounded-xl p-2 hover:border-purple-300 hover:bg-purple-50/40 transition"
+    >
+      {isImage ? (
+        <img src={doc.dataUri} alt={label} className="w-full h-24 object-cover rounded-lg mb-2" />
+      ) : (
+        <div className="w-full h-24 flex items-center justify-center bg-gray-50 rounded-lg mb-2">
+          <FileText size={28} className="text-gray-400" />
+        </div>
+      )}
+      <p className="text-[11px] font-medium text-gray-700 truncate">{label}</p>
+      <p className="text-[10px] text-purple-600 flex items-center gap-1 mt-0.5"><Download size={10} /> Download</p>
+    </a>
   )
 }
 
