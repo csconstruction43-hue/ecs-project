@@ -17,7 +17,7 @@ function CheckoutPage() {
   const sessionId = searchParams.get('session_id')
   const canceled = searchParams.get('canceled')
   const plan = PLAN_DETAILS[planId] || PLAN_DETAILS.monthly
-  const { isAuthenticated, startCheckout, confirmCheckoutSession, requestManualPlan, user } = useAuth()
+  const { isAuthenticated, startCheckout, confirmCheckoutSession, requestManualPlan, user, login, signup } = useAuth()
 
   const [redirecting, setRedirecting] = useState(false)
   const [error, setError] = useState('')
@@ -25,6 +25,18 @@ function CheckoutPage() {
   const [success, setSuccess] = useState(false)
   const [requesting, setRequesting] = useState(false)
   const [requestError, setRequestError] = useState('')
+
+  // Inline quick sign-up / sign-in, right here on the checkout page — so
+  // paying never sends the person away to a separate /login page. We still
+  // need *some* account behind the payment (Pro status is stored against a
+  // userId, and Stripe needs an email + client_reference_id), but that
+  // account is created silently as part of clicking "Continue to Payment".
+  const [authMode, setAuthMode] = useState('signup') // 'signup' | 'login'
+  const [authName, setAuthName] = useState('')
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [authError, setAuthError] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
 
   // New feature: coupon codes at checkout.
   const [couponInput, setCouponInput] = useState('')
@@ -67,6 +79,49 @@ function CheckoutPage() {
 
   const isPending = user?.pendingPlan === planId
 
+  // Handles the inline auth form's submit: sign up (or sign in) the person
+  // right on this page, then immediately continue to Stripe — no redirect,
+  // no separate login screen in between.
+  const handleAuthAndPay = async (e) => {
+    e.preventDefault()
+    setAuthError('')
+    setAuthLoading(true)
+    try {
+      if (authMode === 'signup') {
+        if (!authName.trim() || !authEmail.trim() || authPassword.length < 6) {
+          setAuthError('Please enter your name, email and a password (6+ characters).')
+          setAuthLoading(false)
+          return
+        }
+        try {
+          await signup({ name: authName.trim(), email: authEmail.trim(), password: authPassword })
+        } catch (err) {
+          if ((err.message || '').toLowerCase().includes('already exists')) {
+            setAuthMode('login')
+            setAuthError('An account with this email already exists — enter your password below to continue.')
+            setAuthLoading(false)
+            return
+          }
+          throw err
+        }
+      } else {
+        if (!authEmail.trim() || !authPassword) {
+          setAuthError('Please enter your email and password.')
+          setAuthLoading(false)
+          return
+        }
+        await login({ email: authEmail.trim(), password: authPassword })
+      }
+      // Straight into Stripe checkout now — same click, no extra step.
+      setRedirecting(true)
+      await startCheckout(planId, appliedCoupon?.code)
+    } catch (err) {
+      setAuthError(err.message || 'Could not continue. Please check your details and try again.')
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
   // Coming back from Stripe with a session_id — verify the payment.
   useEffect(() => {
     if (!sessionId) return
@@ -88,14 +143,84 @@ function CheckoutPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 max-w-md text-center">
-          <Lock className="mx-auto text-blue-600 mb-4" size={36} />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Sign in to continue</h2>
-          <p className="text-gray-600 mb-6">Please sign in or create a free account before upgrading to Pro.</p>
-          <Link to="/login" state={{ from: `/checkout?plan=${planId}` }} className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-            Sign In
-          </Link>
+      <div className="min-h-[60vh] flex items-center justify-center px-4 py-12">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 max-w-md w-full">
+          <div className="text-center mb-6">
+            <Lock className="mx-auto text-blue-600 mb-3" size={32} />
+            <h2 className="text-xl font-bold text-gray-900 mb-1">
+              ECSPrep Pro — {plan.name} ({plan.price})
+            </h2>
+            <p className="text-gray-500 text-sm">Enter your details to pay — this takes you straight to Stripe, no separate sign-in page.</p>
+          </div>
+
+          {authError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-lg mb-4 text-sm">
+              {authError}
+            </div>
+          )}
+
+          <form onSubmit={handleAuthAndPay} className="space-y-3">
+            {authMode === 'signup' && (
+              <input
+                type="text"
+                required
+                placeholder="Full name"
+                value={authName}
+                onChange={(e) => setAuthName(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            )}
+            <input
+              type="email"
+              required
+              placeholder="Email address"
+              value={authEmail}
+              onChange={(e) => setAuthEmail(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <input
+              type="password"
+              required
+              minLength={6}
+              placeholder={authMode === 'signup' ? 'Create a password (6+ characters)' : 'Password'}
+              value={authPassword}
+              onChange={(e) => setAuthPassword(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <button
+              type="submit"
+              disabled={authLoading}
+              className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-60"
+            >
+              {authLoading ? 'Please wait…' : 'Continue to Payment'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-4">
+            {authMode === 'signup' ? (
+              <>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('login'); setAuthError('') }}
+                  className="text-blue-600 font-medium hover:underline"
+                >
+                  Sign in here
+                </button>
+              </>
+            ) : (
+              <>
+                New here?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('signup'); setAuthError('') }}
+                  className="text-blue-600 font-medium hover:underline"
+                >
+                  Create an account
+                </button>
+              </>
+            )}
+          </p>
         </div>
       </div>
     )
