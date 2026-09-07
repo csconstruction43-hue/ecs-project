@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   ClipboardList,
+  ClipboardCheck,
   CreditCard,
   FileSignature,
   ShieldAlert,
@@ -124,7 +125,7 @@ const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   // Mobile/tablet (below lg): sidebar is an off-canvas drawer, closed by default.
   const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const [counts, setCounts] = useState({ courseRequests: 0, paymentRequests: 0, openTickets: 0, openQuestionReports: 0, pendingCardApplications: 0 })
+  const [counts, setCounts] = useState({ courseRequests: 0, paymentRequests: 0, openTickets: 0, openQuestionReports: 0, pendingCardApplications: 0, newTestBookings: 0 })
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -139,12 +140,13 @@ const AdminLayout = () => {
       // the super-admin-only endpoints (course/payment requests), which
       // shouldn't stop their own badges (tickets/reports/applications)
       // from loading.
-      const [courseRes, paymentRes, ticketRes, reportRes, appRes] = await Promise.allSettled([
+      const [courseRes, paymentRes, ticketRes, reportRes, appRes, testBookingRes] = await Promise.allSettled([
         isSuperAdmin ? apiRequest('/api/admin/course-requests') : Promise.resolve({ requests: [] }),
         isSuperAdmin ? apiRequest('/api/admin/payment-requests') : Promise.resolve({ requests: [] }),
         apiRequest('/api/admin/tickets'),
         apiRequest('/api/admin/question-reports'),
         apiRequest('/api/admin/card-applications'),
+        apiRequest('/api/admin/test-bookings'),
       ])
       if (cancelled) return
       setCounts({
@@ -153,6 +155,7 @@ const AdminLayout = () => {
         openTickets: ticketRes.status === 'fulfilled' ? ticketRes.value.tickets.filter((t) => t.status === 'open').length : 0,
         openQuestionReports: reportRes.status === 'fulfilled' ? reportRes.value.reports.filter((r) => r.status === 'open').length : 0,
         pendingCardApplications: appRes.status === 'fulfilled' ? appRes.value.applications.filter((a) => a.stage === 'submitted').length : 0,
+        newTestBookings: testBookingRes.status === 'fulfilled' ? testBookingRes.value.bookings.filter((b) => b.status === 'new').length : 0,
       })
     }
     loadCounts()
@@ -177,6 +180,7 @@ const AdminLayout = () => {
     { path: '/admin/support-tickets', icon: Inbox, label: 'Support Tickets', badgeKey: 'openTickets' },
     { path: '/admin/question-reports', icon: Flag, label: 'Question Reports', badgeKey: 'openQuestionReports' },
     { path: '/admin/card-applications', icon: CreditCard, label: 'Card Applications', badgeKey: 'pendingCardApplications' },
+    { path: '/admin/test-bookings', icon: ClipboardCheck, label: 'Test Bookings', badgeKey: 'newTestBookings' },
     { path: '/admin/notifications', icon: Bell, label: 'Notifications' },
     { path: '/admin/seo-manager', icon: Globe2, label: 'SEO Manager' },
     { path: '/admin/audit-log', icon: ShieldCheck, label: 'Audit Log', superAdminOnly: true },

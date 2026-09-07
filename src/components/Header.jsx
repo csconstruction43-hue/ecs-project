@@ -145,9 +145,10 @@ const Header = () => {
 
   return (
     <>
-      {/* Announcement bar */}
+      {/* Announcement bar — desktop/tablet only; hidden on mobile to avoid
+          cluttering the already-tight mobile header row */}
       {!isPro && !isAnnouncementDismissed && (
-        <div className="relative bg-gradient-to-r from-blue-500 to-secondary text-white text-center py-2 px-10 text-sm font-medium">
+        <div className="relative hidden sm:block bg-gradient-to-r from-blue-500 to-secondary text-white text-center py-2 px-10 text-sm font-medium">
           <span className="inline-flex items-center gap-2 flex-wrap justify-center">
             <Zap size={14} className="text-slate-300" />
             🎯 Get Pro — unlimited tests, AI explanations & analytics
@@ -170,19 +171,19 @@ const Header = () => {
         <div className="h-[3px] w-full" style={{ background: 'var(--hazard-stripe)', backgroundSize: '28px 28px' }} />
 
         {/* Row 1 — logo, search, account */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 gap-3">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 gap-2 sm:gap-3">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-secondary rounded-xl flex items-center justify-center shadow-md shadow-blue-200 group-hover:shadow-blue-300 transition-all">
+            <Link to="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0 min-w-0">
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-secondary rounded-xl flex items-center justify-center shadow-md shadow-blue-200 group-hover:shadow-blue-300 transition-all shrink-0">
                 <Zap size={18} className="text-white fill-white" strokeWidth={2.5} />
               </div>
-              <div>
-                <span className="text-xl font-black text-gray-900 tracking-tight">
+              <div className="min-w-0">
+                <span className="text-lg sm:text-xl font-black text-gray-900 tracking-tight whitespace-nowrap">
                   ECS<span className="text-blue-600">Prep</span>
                 </span>
-                <div className="text-[9px] text-gray-400 font-medium leading-none -mt-0.5 tracking-wider">UK ELECTROTECHNICAL TESTS</div>
+                <div className="hidden sm:block text-[9px] text-gray-400 font-medium leading-none -mt-0.5 tracking-wider whitespace-nowrap">UK ELECTROTECHNICAL TESTS</div>
               </div>
             </Link>
 
@@ -348,7 +349,7 @@ const Header = () => {
             </div>
 
             {/* Mobile controls */}
-            <div className="flex items-center gap-1 xl:hidden">
+            <div className="flex items-center gap-0.5 xl:hidden shrink-0">
               <button
                 onClick={() => { setIsSearchOpen(true); setTimeout(() => searchInputRef.current?.focus(), 0) }}
                 className="p-2 rounded-xl hover:bg-gray-100 transition-colors md:hidden"
@@ -357,8 +358,13 @@ const Header = () => {
                 <Search size={20} className="text-gray-600" />
               </button>
               <NotificationBell />
-              <ThemeToggle />
-              <LanguageSwitcher compact />
+              {/* Theme + language toggles: kept here from sm upward; on
+                  narrow phones they move into the slide-down menu below so
+                  the top row doesn't overflow/clip. */}
+              <div className="hidden sm:flex items-center gap-0.5">
+                <ThemeToggle />
+                <LanguageSwitcher compact />
+              </div>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
@@ -430,6 +436,12 @@ const Header = () => {
         {isMenuOpen && (
           <div className="xl:hidden border-t border-gray-100 bg-white">
             <div className="max-w-7xl mx-auto px-4 py-3">
+              {/* Theme + language: only shown here on phones (<sm) where the
+                  top row hides them to save space */}
+              <div className="flex sm:hidden items-center gap-2 mb-3 pb-3 border-b border-gray-100">
+                <ThemeToggle />
+                <LanguageSwitcher compact />
+              </div>
               <nav className="grid grid-cols-2 gap-1 mb-3">
                 {navLinks.map((link) => (
                   <Link

@@ -30,6 +30,7 @@ import {
   listQuestionReports, getQuestionReport, createQuestionReport, updateQuestionReport, deleteQuestionReport,
   listCardApplications, getCardApplication, getCardApplicationForUser, getCardApplicationForEmail,
   createCardApplication, updateCardApplication,
+  listTestBookings, getTestBooking, getTestBookingForUser, createTestBooking, updateTestBooking,
   listTeamInvitesForEmployer, getTeamInvite, createTeamInvite, updateTeamInvite, deleteTeamInvite,
   listCoupons, getCoupon, getCouponByCode, createCoupon, updateCoupon, deleteCoupon, incrementCouponUsage,
   getSystemHealthSnapshot, exportFullBackup,
@@ -1500,6 +1501,12 @@ app.get('/api/admin/search', requireAuth, requireAdmin, async (req, res) => {
       .filter((a) => (a.fullName || '').toLowerCase().includes(q) || (a.email || '').toLowerCase().includes(q))
       .slice(0, 8)
       .forEach((a) => results.push({ type: 'Card Application', label: `${a.fullName} (${a.email})`, path: `/admin/card-applications` }))
+
+    const testBookingRows = await listTestBookings()
+    testBookingRows
+      .filter((b) => (b.fullName || '').toLowerCase().includes(q) || (b.email || '').toLowerCase().includes(q))
+      .slice(0, 8)
+      .forEach((b) => results.push({ type: 'Test Booking', label: `${b.fullName} (${b.email})`, path: `/admin/test-bookings` }))
   }
 
   res.json({ results: results.slice(0, 20) })
@@ -3069,6 +3076,34 @@ function testBookingConfirmationHtml(fullName) {
 </body></html>`
 }
 
+const TEST_BOOKING_STATUSES = ['new', 'contacted', 'slot_confirmed', 'payment_received', 'completed', 'cancelled']
+const TEST_BOOKING_STATUS_LABELS = {
+  new: 'New request',
+  contacted: 'Candidate contacted',
+  slot_confirmed: 'Test slot confirmed',
+  payment_received: 'Payment received',
+  completed: 'Test completed',
+  cancelled: 'Cancelled',
+}
+
+function testBookingStatusEmailHtml(fullName, statusLabel, note) {
+  return `
+<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#f3f4f6;padding:32px;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;">
+  <div style="background:linear-gradient(135deg,#2563eb,#1d4ed8);padding:32px;text-align:center;">
+    <h1 style="color:#fff;margin:0;font-size:20px;">📝 Your ECS test booking has been updated</h1>
+  </div>
+  <div style="padding:32px;">
+    <p style="color:#374151;font-size:16px;">Hi ${fullName || 'there'},</p>
+    <p style="color:#374151;font-size:16px;">Your test booking status is now:</p>
+    <p style="font-size:20px;font-weight:700;color:#1d4ed8;background:#eff6ff;border-radius:12px;padding:14px 18px;margin:16px 0;">${statusLabel}</p>
+    ${note ? `<p style="color:#374151;font-size:15px;">${String(note).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]))}</p>` : ''}
+    <p style="color:#6b7280;font-size:13px;margin-top:24px;">— The ECSPrep team</p>
+  </div>
+</div>
+</body></html>`
+}
+
 app.post('/api/book-test', contactLimiter, async (req, res) => {
   const { fullName, email, phone, testCategory, preferredCentre, preferredDate, notes } = req.body || {}
   if (!fullName || !email || !phone || !testCategory) {
@@ -3088,7 +3123,62 @@ app.post('/api/book-test', contactLimiter, async (req, res) => {
   })
   await sendEmail({ to: email, subject: 'We\u2019ve received your ECS test booking request', html: testBookingConfirmationHtml(fullName) })
 
-  res.json({ success: true })
+  // Persist the request so it shows up in the admin panel (previously this
+  // route only ever sent emails — nothing was saved anywhere, unlike
+  // /api/book-card which already tracks into card_applications).
+  let submitterUserId = null
+  const authHeader = req.headers.authorization || ''
+  if (authHeader.startsWith('Bearer ')) {
+    try { submitterUserId = jwt.verify(authHeader.slice(7), JWT_SECRET).sub } catch { /* guest booking is fine */ }
+  }
+  const bookingId = `tbk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  await createTestBooking({
+    id: bookingId,
+    userId: submitterUserId,
+    fullName, email, phone, testCategory, preferredCentre, preferredDate, notes,
+    status: 'new',
+    statusHistory: [{ status: 'new', at: new Date().toISOString(), note: '' }],
+  })
+
+  res.json({ success: true, bookingId })
+})
+
+app.get('/api/user/test-booking', requireAuth, async (req, res) => {
+  const booking = await getTestBookingForUser(req.user.id)
+  res.json({ booking: booking || null })
+})
+
+app.get('/api/admin/test-bookings', requireAuth, requireAdmin, async (req, res) => {
+  const bookings = await listTestBookings()
+  res.json({ bookings })
+})
+
+app.get('/api/admin/test-bookings/:id', requireAuth, requireAdmin, async (req, res) => {
+  const booking = await getTestBooking(req.params.id)
+  if (!booking) return res.status(404).json({ error: 'Booking not found.' })
+  res.json({ booking })
+})
+
+app.patch('/api/admin/test-bookings/:id', requireAuth, requireAdmin, async (req, res) => {
+  const existing = await getTestBooking(req.params.id)
+  if (!existing) return res.status(404).json({ error: 'Booking not found.' })
+  const { status, note } = req.body || {}
+  if (status !== undefined && !TEST_BOOKING_STATUSES.includes(status)) return res.status(400).json({ error: 'Invalid status.' })
+
+  const patch = {}
+  if (status !== undefined) {
+    patch.status = status
+    const history = Array.isArray(existing.statusHistory) ? existing.statusHistory : []
+    patch.statusHistory = [...history, { status, at: new Date().toISOString(), note: note || '' }]
+  }
+  const booking = await updateTestBooking(req.params.id, patch)
+
+  if (status !== undefined && status !== existing.status) {
+    const label = TEST_BOOKING_STATUS_LABELS[status] || status
+    sendEmail({ to: existing.email, subject: `Update on your ECS test booking — ${label}`, html: testBookingStatusEmailHtml(existing.fullName, label, note) })
+  }
+  await logAdminAudit({ adminId: req.user.id, adminEmail: req.user.email, action: 'test_booking_updated', targetType: 'test_booking', targetId: req.params.id, meta: { status: patch.status } })
+  res.json({ booking })
 })
 
 // ---- Scheduled notification emails (weekly report, exam reminders,

@@ -155,6 +155,7 @@ const AdminSupportTickets = lazy(() => import('./pages/admin/AdminSupportTickets
 const AdminNotifications = lazy(() => import('./pages/admin/AdminNotifications'))
 const AdminQuestionReports = lazy(() => import('./pages/admin/AdminQuestionReports'))
 const AdminCardApplications = lazy(() => import('./pages/admin/AdminCardApplications'))
+const AdminTestBookings = lazy(() => import('./pages/admin/AdminTestBookings'))
 const AdminSeoManager = lazy(() => import('./pages/admin/AdminSeoManager'))
 const AdminCoupons = lazy(() => import('./pages/admin/AdminCoupons'))
 const AdminSystemHealth = lazy(() => import('./pages/admin/AdminSystemHealth'))
@@ -368,6 +369,7 @@ function App() {
           <Route path="notifications" element={<AdminNotifications />} />
           <Route path="question-reports" element={<AdminQuestionReports />} />
           <Route path="card-applications" element={<AdminCardApplications />} />
+          <Route path="test-bookings" element={<AdminTestBookings />} />
           <Route path="seo-manager" element={<AdminSeoManager />} />
           <Route path="coupons" element={<ProtectedRoute requireSuperAdmin><AdminCoupons /></ProtectedRoute>} />
           <Route path="system-health" element={<ProtectedRoute requireSuperAdmin><AdminSystemHealth /></ProtectedRoute>} />

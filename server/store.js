@@ -171,6 +171,20 @@ function ensureSchema() {
       );
       CREATE UNIQUE INDEX IF NOT EXISTS coupons_code_lower_idx ON coupons ((lower(code)));
       CREATE INDEX IF NOT EXISTS coupons_created_at_idx ON coupons (created_at DESC);
+
+      -- New feature: ECS test booking requests (candidate + admin view of
+      -- what was previously a fire-and-forget email in /api/book-test),
+      -- mirroring card_applications so every booking (test AND card)
+      -- lands in the admin panel, not just an inbox.
+      CREATE TABLE IF NOT EXISTS test_bookings (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        data JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS test_bookings_created_at_idx ON test_bookings (created_at DESC);
+      CREATE INDEX IF NOT EXISTS test_bookings_user_id_idx ON test_bookings (user_id);
     `)
   }
   return schemaReady
@@ -824,6 +838,53 @@ export async function updateCardApplication(id, patch) {
   delete merged.userId
   await pool.query('UPDATE card_applications SET user_id = $2, data = $3, updated_at = now() WHERE id = $1', [id, newUserId || null, JSON.stringify(merged)])
   return getCardApplication(id)
+}
+
+// ---------- Test bookings (ECS test booking requests) ----------
+function rowToTestBooking(row) {
+  if (!row) return null
+  return { id: row.id, userId: row.user_id, createdAt: row.created_at, updatedAt: row.updated_at, ...row.data }
+}
+
+export async function listTestBookings() {
+  await ensureSchema()
+  const { rows } = await pool.query('SELECT * FROM test_bookings ORDER BY created_at DESC')
+  return rows.map(rowToTestBooking)
+}
+
+export async function getTestBooking(id) {
+  await ensureSchema()
+  const { rows } = await pool.query('SELECT * FROM test_bookings WHERE id = $1 LIMIT 1', [id])
+  return rowToTestBooking(rows[0])
+}
+
+// Most recent test booking linked to a signed-in user's account.
+export async function getTestBookingForUser(userId) {
+  await ensureSchema()
+  const { rows } = await pool.query(
+    'SELECT * FROM test_bookings WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
+    [userId]
+  )
+  return rowToTestBooking(rows[0])
+}
+
+export async function createTestBooking(booking) {
+  await ensureSchema()
+  const { id, userId, ...rest } = booking
+  await pool.query('INSERT INTO test_bookings (id, user_id, data) VALUES ($1, $2, $3)', [id, userId || null, JSON.stringify(rest)])
+  return getTestBooking(id)
+}
+
+export async function updateTestBooking(id, patch) {
+  await ensureSchema()
+  const existing = await getTestBooking(id)
+  if (!existing) return null
+  const { id: _id, userId: existingUserId, createdAt, updatedAt, ...restExisting } = existing
+  const merged = { ...restExisting, ...patch }
+  const newUserId = patch.userId !== undefined ? patch.userId : existingUserId
+  delete merged.userId
+  await pool.query('UPDATE test_bookings SET user_id = $2, data = $3, updated_at = now() WHERE id = $1', [id, newUserId || null, JSON.stringify(merged)])
+  return getTestBooking(id)
 }
 
 // ---------- Team invites (Employer Team Invitations) ----------
