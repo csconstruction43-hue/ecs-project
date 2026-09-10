@@ -39,7 +39,7 @@ export const PLANS = {
       'Analytics dashboard',
       'Cancel anytime',
     ],
-    link: 'https://www.paypal.com/ncp/payment/ELWXQ4SMCK83E',
+    link: 'https://www.paypal.com/ncp/payment/LHXQWMGSZUMCJ',
     buttonText: 'Try now',
   },
   monthly: {
