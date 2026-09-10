@@ -39,7 +39,7 @@ export const PLANS = {
       'Analytics dashboard',
       'Cancel anytime',
     ],
-    link: '/checkout?plan=weekly',
+    link: 'https://www.paypal.com/ncp/payment/E9M7MHKU2M3HA',
     buttonText: 'Try now',
   },
   monthly: {
@@ -59,7 +59,7 @@ export const PLANS = {
       'Personalised study plan',
       'Cancel anytime',
     ],
-    link: '/checkout?plan=monthly',
+    link: 'https://www.paypal.com/ncp/payment/E9M7MHKU2M3HA',
     buttonText: 'Get started',
   },
   lifetime: {
@@ -75,7 +75,7 @@ export const PLANS = {
       'All future updates',
       'Covers card renewal resits (3–5 yr)',
     ],
-    link: '/checkout?plan=lifetime',
+    link: 'https://www.paypal.com/ncp/payment/E9M7MHKU2M3HA',
     buttonText: 'Best value',
   },
 }
