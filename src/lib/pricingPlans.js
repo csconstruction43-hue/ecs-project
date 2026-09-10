@@ -59,7 +59,7 @@ export const PLANS = {
       'Personalised study plan',
       'Cancel anytime',
     ],
-    link: 'https://www.paypal.com/ncp/payment/E9M7MHKU2M3HA',
+    link: 'https://www.paypal.com/ncp/payment/LHXQWMGSZUMCJ',
     buttonText: 'Get started',
   },
   lifetime: {
