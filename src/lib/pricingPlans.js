@@ -75,7 +75,7 @@ export const PLANS = {
       'All future updates',
       'Covers card renewal resits (3–5 yr)',
     ],
-    link: 'https://www.paypal.com/ncp/payment/E9M7MHKU2M3HA',
+    link: 'https://www.paypal.com/ncp/payment/RC55YV2WE4EWN',
     buttonText: 'Best value',
   },
 }
