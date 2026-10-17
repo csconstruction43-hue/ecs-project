@@ -2555,9 +2555,21 @@ app.post('/api/stripe/create-checkout-session', requireAuth, async (req, res) =>
   }
 
   try {
+    const mode = plan === 'lifetime' ? 'payment' : 'subscription'
     const session = await stripe.checkout.sessions.create({
-      mode: plan === 'lifetime' ? 'payment' : 'subscription',
-      payment_method_types: ['card'],
+      // ---- Set in Checkout Studio (fixed_by_ui) ----
+      ui_mode: 'hosted', // stripe SDK < 21.0.0 uses 'hosted'; SDK >= 21.0.0 uses 'hosted_page'
+      billing_address_collection: 'auto',
+      phone_number_collection: { enabled: false },
+      automatic_tax: { enabled: false },
+      // Stripe rejects allow_promotion_codes together with discounts (own coupon system above)
+      ...(discounts ? {} : { allow_promotion_codes: false }),
+      // payment_method_collection is subscription-only, submit_type is payment-only
+      ...(mode === 'subscription' ? { payment_method_collection: 'always' } : { submit_type: 'auto' }),
+      integration_identifier: 'hosted_web_0001',
+      origin_context: 'web',
+      // ---- Existing app values (kept as-is) ----
+      mode,
       line_items: [{ price: priceId, quantity: 1 }],
       customer_email: req.user.email,
       client_reference_id: req.user.id,
