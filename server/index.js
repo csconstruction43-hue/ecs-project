@@ -2566,8 +2566,6 @@ app.post('/api/stripe/create-checkout-session', requireAuth, async (req, res) =>
       ...(discounts ? {} : { allow_promotion_codes: false }),
       // payment_method_collection is subscription-only, submit_type is payment-only
       ...(mode === 'subscription' ? { payment_method_collection: 'always' } : { submit_type: 'auto' }),
-      integration_identifier: 'hosted_web_0001',
-      origin_context: 'web',
       // ---- Existing app values (kept as-is) ----
       mode,
       line_items: [{ price: priceId, quantity: 1 }],
