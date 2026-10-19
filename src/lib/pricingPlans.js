@@ -1,5 +1,7 @@
 // lib/pricingPlans.js
 // Single source of truth for plan names, prices and features.
+// Sab paid plans ab ek-baar ke payment (one-time pass) hain: auto-renew nahi.
+// accessDays = kitne din ka access (null = hamesha ke liye).
 
 export const PLANS = {
   free: {
@@ -8,6 +10,7 @@ export const PLANS = {
     price: '£0',
     priceValue: 0,
     period: null,
+    accessDays: null,
     tagline: 'Try before you buy',
     features: [
       '2 free sample mock tests',
@@ -23,8 +26,7 @@ export const PLANS = {
     price: '£4.99',
     priceValue: 4.99,
     period: 'week',
-    paypalType: 'subscription',
-    paypalPlanId: 'PASTE_WEEKLY_PLAN_ID_HERE',
+    accessDays: 7,
     tagline: 'Short-term crammer',
     features: [
       'Unlimited mock tests',
@@ -32,7 +34,7 @@ export const PLANS = {
       'All 22 ECS test routes',
       'Practice by topic',
       'Analytics dashboard',
-      'Cancel anytime',
+      '7 days access, no auto-renewal',
     ],
     link: '/checkout?plan=weekly',
     buttonText: 'Try now',
@@ -43,8 +45,7 @@ export const PLANS = {
     price: '£9.99',
     priceValue: 9.99,
     period: 'month',
-    paypalType: 'subscription',
-    paypalPlanId: 'P-4H691120ST240793ENLK67FY',
+    accessDays: 30,
     tagline: 'Most popular',
     popular: true,
     features: [
@@ -54,7 +55,7 @@ export const PLANS = {
       'Practice by topic',
       'Analytics dashboard',
       'Personalised study plan',
-      'Cancel anytime',
+      '30 days access, no auto-renewal',
     ],
     link: '/checkout?plan=monthly',
     buttonText: 'Get started',
@@ -65,7 +66,7 @@ export const PLANS = {
     price: '£60',
     priceValue: 60,
     period: 'one-time',
-    paypalType: 'order',
+    accessDays: null,
     tagline: 'Best long-term value',
     features: [
       'Everything in Monthly',
