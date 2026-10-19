@@ -2,6 +2,7 @@
 //
 // Kahan rakhein: apne purane CheckoutPage ki jagah (jaise src/pages/CheckoutPage.jsx)
 // Import path neeche line 1 me apne folder ke hisaab se theek kar lein.
+// Guest checkout: login ki zarurat nahi, sirf email se payment jud jata hai.
 // Zaruri: lib/pricingPlans.js me weekly/monthly par `paypalType: 'subscription'` +
 // `paypalPlanId`, aur lifetime par `paypalType: 'order'` hona chahiye.
 
@@ -144,6 +145,11 @@ export default function CheckoutPage() {
   const [status, setStatus] = useState("idle"); // idle | confirming | done | failed
   const [message, setMessage] = useState("");
 
+  // Login ki zarurat nahi: sirf email lete hain taaki payment us email se jud jaye
+  const [email, setEmail] = useState("");
+  const emailRef = useRef("");
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
   async function handleSuccess(result) {
     setStatus("confirming");
     setMessage("Payment received. Activating your plan...");
@@ -151,8 +157,7 @@ export default function CheckoutPage() {
       const res = await fetch(CONFIRM_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(result),
+        body: JSON.stringify({ ...result, email: emailRef.current }),
       });
       if (!res.ok) throw new Error("Server could not verify payment");
       setStatus("done");
@@ -217,11 +222,36 @@ export default function CheckoutPage() {
       </section>
 
       {status === "idle" && (
-        <PayPalButton
-          plan={plan}
-          onSuccess={handleSuccess}
-          onError={() => {}}
-        />
+        <>
+          <label htmlFor="checkout-email" style={styles.label}>
+            Your email (no account needed)
+          </label>
+          <input
+            id="checkout-email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              emailRef.current = e.target.value.trim();
+            }}
+            style={styles.input}
+          />
+          <p style={styles.muted}>
+            We use this email to activate your plan and send your receipt.
+          </p>
+
+          {emailOk ? (
+            <PayPalButton
+              plan={plan}
+              onSuccess={handleSuccess}
+              onError={() => {}}
+            />
+          ) : (
+            <p style={styles.muted}>Enter a valid email to see the payment button.</p>
+          )}
+        </>
       )}
 
       {status !== "idle" && (
@@ -251,4 +281,14 @@ const styles = {
     marginBottom: 24,
   },
   list: { paddingLeft: 20, margin: "12px 0 0" },
+  label: { display: "block", fontWeight: 600, marginBottom: 6 },
+  input: {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "10px 12px",
+    fontSize: 16,
+    border: "1px solid #bbb",
+    borderRadius: 6,
+    marginBottom: 6,
+  },
 };
