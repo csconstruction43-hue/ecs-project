@@ -1,123 +1,80 @@
-// CheckoutPage.jsx  (ek hi file me sab kuch: page + PayPal button)
-//
-// Kahan rakhein: apne purane CheckoutPage ki jagah (jaise src/pages/CheckoutPage.jsx)
-// Import path neeche line 1 me apne folder ke hisaab se theek kar lein.
-// Guest checkout: login ki zarurat nahi, sirf email se payment jud jata hai.
-// Zaruri: lib/pricingPlans.js me weekly/monthly par `paypalType: 'subscription'` +
-// `paypalPlanId`, aur lifetime par `paypalType: 'order'` hona chahiye.
+// src/pages/CheckoutPage.jsx
+// Guest checkout (login nahi) + ek-baar ka payment (weekly / monthly / lifetime).
+// PayPal account ki zarurat nahi: card se bhi pay ho sakta hai.
+// Auto-renew nahi hota. Access ki expiry server par email ke saath save hogi.
 
 import { useEffect, useRef, useState } from "react";
-import { PLANS } from "../lib/pricingPlans"; // <-- path apne project ke hisaab se badlein
+import { PLANS } from "../lib/pricingPlans";
 
 // ---------- Settings ----------
 const PAYPAL_CLIENT_ID =
   "BAARo_tccNroZ_wxOWP38vaPoNT7aYM7pUUCwTLF8V52gnbiahxopSJ5LALLPUZ8lGyRprkw-3BRUYWlqE";
 
-// Payment ke baad server ko bataane ka endpoint (server/index.js me banana hai)
+// Server endpoint jo payment verify karke access dega (server/index.js me banana hai)
 const CONFIRM_ENDPOINT = "/api/paypal/confirm";
 
 // Payment safal hone ke baad user kahan jayega
 const SUCCESS_REDIRECT = "/";
 
 // ---------- PayPal SDK loader ----------
-// Subscription aur ek-baar-ka-payment ki SDK settings alag hoti hain,
-// isliye mode badalne par script dobara load hoti hai.
-function loadPayPal(mode) {
-  if (window.__paypalMode === mode && window.paypal) {
-    return Promise.resolve(window.paypal);
-  }
-  document
-    .querySelectorAll("script[data-paypal-sdk]")
-    .forEach((s) => s.remove());
-  delete window.paypal;
-
-  const params =
-    mode === "subscription"
-      ? `client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription&currency=GBP`
-      : `client-id=${PAYPAL_CLIENT_ID}&intent=capture&currency=GBP`;
-
-  return new Promise((resolve, reject) => {
+let sdkPromise = null;
+function loadPayPal() {
+  if (window.paypal) return Promise.resolve(window.paypal);
+  if (sdkPromise) return sdkPromise;
+  sdkPromise = new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = `https://www.paypal.com/sdk/js?${params}`;
+    s.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&intent=capture&currency=GBP`;
     s.setAttribute("data-paypal-sdk", "true");
-    s.onload = () => {
-      window.__paypalMode = mode;
-      resolve(window.paypal);
+    s.onload = () => resolve(window.paypal);
+    s.onerror = () => {
+      sdkPromise = null;
+      reject(new Error("PayPal SDK load failed"));
     };
-    s.onerror = () => reject(new Error("PayPal SDK load failed"));
     document.body.appendChild(s);
   });
+  return sdkPromise;
 }
 
-// ---------- PayPal button ----------
-function PayPalButton({ plan, onSuccess, onError }) {
+// ---------- PayPal button (one-time payment) ----------
+function PayPalButton({ plan, onSuccess }) {
   const containerRef = useRef(null);
-  const [loadError, setLoadError] = useState("");
-
-  const isSubscription = plan.paypalType === "subscription";
-  const missingPlanId =
-    isSubscription &&
-    (!plan.paypalPlanId || plan.paypalPlanId.startsWith("PASTE"));
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (missingPlanId) return;
     let cancelled = false;
 
-    loadPayPal(isSubscription ? "subscription" : "order")
+    loadPayPal()
       .then((paypal) => {
         if (cancelled || !containerRef.current) return;
         containerRef.current.innerHTML = "";
 
-        const baseStyle = { shape: "rect", color: "gold", layout: "vertical" };
-        const handleError = (err) => {
-          console.error(err);
-          setLoadError("Payment failed. Please try again.");
-          onError && onError(err);
-        };
-
-        const buttons = isSubscription
-          ? paypal.Buttons({
-              style: { ...baseStyle, label: "subscribe" },
-              createSubscription: (data, actions) =>
-                actions.subscription.create({ plan_id: plan.paypalPlanId }),
-              onApprove: (data) =>
-                onSuccess({
-                  type: "subscription",
-                  planId: plan.id,
-                  subscriptionID: data.subscriptionID,
-                }),
-              onError: handleError,
-            })
-          : paypal.Buttons({
-              style: { ...baseStyle, label: "pay" },
-              createOrder: (data, actions) =>
-                actions.order.create({
-                  purchase_units: [
-                    {
-                      description: `${plan.name} plan`,
-                      amount: {
-                        currency_code: "GBP",
-                        value: plan.priceValue.toFixed(2),
-                      },
+        paypal
+          .Buttons({
+            style: { shape: "rect", color: "gold", layout: "vertical", label: "pay" },
+            createOrder: (data, actions) =>
+              actions.order.create({
+                purchase_units: [
+                  {
+                    description: `${plan.name} plan`,
+                    amount: {
+                      currency_code: "GBP",
+                      value: plan.priceValue.toFixed(2),
                     },
-                  ],
-                }),
-              onApprove: async (data, actions) => {
-                const order = await actions.order.capture();
-                onSuccess({
-                  type: "order",
-                  planId: plan.id,
-                  orderID: order.id,
-                });
-              },
-              onError: handleError,
-            });
-
-        buttons.render(containerRef.current);
+                  },
+                ],
+              }),
+            onApprove: async (data, actions) => {
+              const order = await actions.order.capture();
+              onSuccess({ planId: plan.id, orderID: order.id });
+            },
+            onError: (err) => {
+              console.error(err);
+              setError("Payment failed. Please try again.");
+            },
+          })
+          .render(containerRef.current);
       })
-      .catch(() =>
-        setLoadError("Could not load PayPal. Please refresh the page.")
-      );
+      .catch(() => setError("Could not load PayPal. Please refresh the page."));
 
     return () => {
       cancelled = true;
@@ -125,14 +82,10 @@ function PayPalButton({ plan, onSuccess, onError }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan.id]);
 
-  if (missingPlanId) {
-    return <p>This plan is not available for payment yet.</p>;
-  }
-
   return (
     <div>
       <div ref={containerRef} />
-      {loadError && <p style={{ color: "#b00020" }}>{loadError}</p>}
+      {error && <p style={{ color: "#b00020" }}>{error}</p>}
     </div>
   );
 }
@@ -145,7 +98,7 @@ export default function CheckoutPage() {
   const [status, setStatus] = useState("idle"); // idle | confirming | done | failed
   const [message, setMessage] = useState("");
 
-  // Login ki zarurat nahi: sirf email lete hain taaki payment us email se jud jaye
+  // Login nahi chahiye: sirf email, taaki payment us email se jud jaye
   const [email, setEmail] = useState("");
   const emailRef = useRef("");
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -170,12 +123,11 @@ export default function CheckoutPage() {
       setStatus("failed");
       setMessage(
         "Payment went through, but we could not activate your plan. Please contact support and quote: " +
-          (result.subscriptionID || result.orderID)
+          result.orderID
       );
     }
   }
 
-  // Galat ya missing plan
   if (!plan) {
     return (
       <main style={styles.wrap}>
@@ -186,7 +138,6 @@ export default function CheckoutPage() {
     );
   }
 
-  // Free plan ko checkout ki zarurat nahi
   if (plan.priceValue === 0) {
     return (
       <main style={styles.wrap}>
@@ -197,10 +148,9 @@ export default function CheckoutPage() {
     );
   }
 
-  const billingText =
-    plan.period === "one-time"
-      ? "One-time payment. No recurring charges."
-      : `Billed every ${plan.period}. Cancel anytime from your PayPal account.`;
+  const billingText = plan.accessDays
+    ? `One-time payment for ${plan.accessDays} days of access. No auto-renewal.`
+    : "One-time payment. Access never expires.";
 
   return (
     <main style={styles.wrap}>
@@ -209,9 +159,6 @@ export default function CheckoutPage() {
       <section style={styles.summary}>
         <h2 style={styles.h2}>
           {plan.name} <span style={styles.price}>{plan.price}</span>
-          {plan.period && plan.period !== "one-time" && (
-            <span style={styles.period}> / {plan.period}</span>
-          )}
         </h2>
         <p style={styles.muted}>{billingText}</p>
         <ul style={styles.list}>
@@ -243,11 +190,7 @@ export default function CheckoutPage() {
           </p>
 
           {emailOk ? (
-            <PayPalButton
-              plan={plan}
-              onSuccess={handleSuccess}
-              onError={() => {}}
-            />
+            <PayPalButton plan={plan} onSuccess={handleSuccess} />
           ) : (
             <p style={styles.muted}>Enter a valid email to see the payment button.</p>
           )}
@@ -266,13 +209,12 @@ export default function CheckoutPage() {
   );
 }
 
-// ---------- Simple styles (apne CSS me badal sakte hain) ----------
+// ---------- Simple styles ----------
 const styles = {
   wrap: { maxWidth: 480, margin: "40px auto", padding: "0 16px" },
   h1: { fontSize: 28, marginBottom: 16 },
   h2: { fontSize: 20, margin: "0 0 4px" },
   price: { fontWeight: 700 },
-  period: { fontWeight: 400, color: "#555" },
   muted: { color: "#555", marginTop: 0 },
   summary: {
     border: "1px solid #ddd",
