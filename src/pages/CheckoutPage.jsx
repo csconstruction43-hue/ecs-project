@@ -8,7 +8,7 @@ import { PLANS } from "../lib/pricingPlans";
 
 // ---------- Settings ----------
 const PAYPAL_CLIENT_ID =
-  "BAARo_tccNroZ_wxOWP38vaPoNT7aYM7pUUCwTLF8V52gnbiahxopSJ5LALLPUZ8lGyRprkw-3BRUYWlqE";
+  "Afc27Ar06j2wkEWnZ5z4TAchElICCAZ_00S11o-WFd4NGnop1AJul95o3kwKjfMynzjuaNapyV9-iCtD";
 
 // Server endpoint jo payment verify karke access dega (server/index.js me banana hai)
 const CONFIRM_ENDPOINT = "/api/paypal/confirm";
